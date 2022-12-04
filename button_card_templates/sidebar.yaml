@@ -18,14 +18,12 @@ sidebar:
     #card {
       padding: 0;
       font-family: SF Pro Display, Roboto, system-ui;
-    }
-    #container {
-      display: flex !important;
+      border-width: 0;
     }
     #name {
       padding: 1vw 2.5vw 0 var(--custom-layout-card-padding);
       white-space: normal;
-      text-align: left;
+      text-align: center;
     }
     .iphone {
       font-size: 1.5em;
@@ -38,6 +36,14 @@ sidebar:
       letter-spacing: 0.11vw;
       margin-left: -0.3vw;
       color: rgba(255, 255, 255, 0.8);
+      margin: 21px
+    }
+    .date {
+      font-size: var(--sidebar-date-font-size);
+      line-height: var(--sidebar-date-line-height);
+    }
+    hr {
+      margin: 0px -10px 0px -20px
     }
     @supports not (-moz-appearance:none) {
       .time-colon {
@@ -50,7 +56,8 @@ sidebar:
       line-height: var(--sidebar-line-height);
       font-weight: 200;
       letter-spacing: 0.07vw;
-      color: #6a7377;
+      color: #b2b7b9;
+      margin-left: -10px;
     }
     b {
       font-weight: 700;
@@ -61,8 +68,12 @@ sidebar:
     /* portrait */
     @media screen and (max-width: 1200px) {
       .time {
-        font-size: calc(var(--sidebar-time-font-size) * 1.4 );
-        line-height: calc(var(--sidebar-time-line-height) * 1.4 );
+        font-size: calc(var(--sidebar-time-font-size) * 2 );
+        line-height: calc(var(--sidebar-time-line-height) * 2 );
+      }
+      .date {
+        font-size: calc(var(--sidebar-font-size) * 2 );
+        line-height: calc(var(--sidebar-line-height) * 1.4 );
       }
       p {
         font-size: calc(var(--sidebar-font-size) * 1.4 );

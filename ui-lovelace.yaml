@@ -3,7 +3,7 @@ button_card_templates:
 
 views:
   - type: custom:grid-layout
-    path: 0
+    title: Home
     layout:
       #default
       margin: 0
@@ -12,8 +12,8 @@ views:
       grid-template-rows: 0 repeat(2, fit-content(100%)) 0fr
       grid-template-areas: |
         "sidebar  .           .       .       ."
-        "sidebar  vardagsrum  studio  sovrum  ."
-        "sidebar  media       övrigt  hemma   ."
+        "sidebar  home        media   living  ."
+        "sidebar  playing     patio   us      ."
         "sidebar  footer      footer  footer  ."
       mediaquery:
         #phone
@@ -24,9 +24,9 @@ views:
           grid-template-areas: |
             ".  .           .        ."
             ".  sidebar     sidebar  ."
-            ".  vardagsrum  sovrum   ."
-            ".  studio      övrigt   ."
-            ".  media       hemma    ."
+            ".  home        living   ."
+            ".  media       patio    ."
+            ".  playing     us       ."
             ".  footer      footer   ."
             ".  .           .        ."
         #portrait
@@ -36,9 +36,9 @@ views:
           grid-template-rows: 0 repeat(3, fit-content(100%)) 0fr
           grid-template-areas: |
             "sidebar  .           .       ."
-            "sidebar  vardagsrum  sovrum  ."
-            "sidebar  studio      övrigt  ."
-            "sidebar  media       hemma   ."
+            "sidebar  home        living  ."
+            "sidebar  media       patio   ."
+            "sidebar  playing     us      ."
             "sidebar  footer      footer  ."
             "sidebar  .           .       ."
     cards:
@@ -79,51 +79,118 @@ views:
         view_layout:
           grid-area: sidebar
         cards:
-
           - type: custom:button-card
             entity: sensor.template_sidebar
             template: sidebar
-
-          - type: conditional
-            conditions:
-              - entity: input_boolean.laundry_display
-                state: 'on'
-            card:
-              type: custom:button-card
-              entity: timer.laundry
-              double_tap_action:
-                action: call-service
-                service: input_boolean.turn_off
-                service_data:
-                  entity_id: input_boolean.laundry_display
-              template: laundry
+          - type: 'custom:button-card'
+            name: Home
+            styles:
+              icon:
+                - width: '8%'
+              grid:
+                - grid-template-areas: '"n i"'
+            layout: icon_name
+            icon: mdi:home2
+            tap_action:
+              action: navigate
+              navigation_path: /lovelace-playground/fire?hide_header
+          - type: 'custom:button-card'
+            name: Lights
+            styles:
+              icon:
+                - width: '8%'
+              grid:
+                - grid-template-areas: '"n i"'
+            layout: icon_name
+            icon: fas:lightbulb
+            tap_action:
+              action: navigate
+              navigation_path: /lovelace-playground/lights?hide_header
+          - type: 'custom:button-card'
+            name: Media
+            styles:
+              icon:
+                - width: '8%'
+              grid:
+                - grid-template-areas: '"n i"'
+            layout: icon_name
+            icon: fas:photo-video
+            tap_action:
+              action: navigate
+              navigation_path: /lovelace-playground/media?hide_header
+          - type: 'custom:button-card'
+            name: Patio
+            styles:
+              icon:
+                - width: '8%'
+              grid:
+                - grid-template-areas: '"n i"'
+            layout: icon_name
+            icon: mdi:string-lights
+            tap_action:
+              action: navigate
+              navigation_path: /lovelace-playground/patio?hide_header
+          - type: 'custom:button-card'
+            name: Kitchen
+            styles:
+              icon: 
+                - width: '8%'
+              grid:
+                - grid-template-areas: '"n i"'
+            layout: icon_name
+            icon: mdi:faucet-variant
+            tap_action:
+              action: navigate
+              navigation_path: /ui-lovelace-minimalist/0?hide_header
+          - type: custom:weather-card
+            entity: weather.home
+            number_of_forecasts: '5'
+            details: false
+            card_mod:
+              style: | 
+                ha-card { box-shadow: none; 
+                background: rgb(10 73 104 / 0%) !important; }
 
       #################################################
       #                                               #
-      #                  VARDAGSRUM                   #
+      #                  Home                         #
       #                                               #
       #################################################
 
       - type: grid
-        title: Vardagsrum
+        title: Home
         view_layout:
-          grid-area: vardagsrum
-        columns: 2
+          grid-area: home
+        columns: 2 
         cards:
 
           - type: custom:button-card
-            entity: light.vardagsrum_group
-            name: Belysning
-            template:
-              - light
-              - icon_hue
+            entity: cover.garage_door  
+            name: Garage Door  
+            template: 
+              - garage
+              - icon_garage 
 
-          - type: custom:button-card
-            entity: light.vardagsrum_horna
-            name: Hörnlampa
+          - type: custom:button-card  
+            entity: light.all_lights 
+            name: All Lights
             template:
+              - base 
+              - icon_hue
+              - loader
               - light
-              - icon_shade
+
+          - type: conditional
+            conditions:
+              - entity: timer.alexa
+                state_not: 'idle'
+            card:
+              type: custom:button-card
+              entity: timer.alexa
+              name: Timer
+              template:
+                - base
+                - icon_timer
 
           - type: custom:button-card
             entity: media_player.sony_bravia_tv
@@ -144,106 +211,93 @@ views:
               - icon_tv
               - loader
 
-          - type: custom:button-card
-            entity: switch.deltaco_sh_p01_socket
-            name: Balkong
-            double_tap_action:
-              !include popup/vardagsrum_balkong.yaml
-            template:
-              - base
-              - icon_hue
-              - loader
-
       #################################################
       #                                               #
-      #                    STUDIO                     #
+      #                    Media                      #
       #                                               #
       #################################################
 
       - type: grid
-        title: Studio
+        title: Media Room
         view_layout:
-          grid-area: studio
+          grid-area: media
         columns: 2
         cards:
 
           - type: custom:button-card
-            entity: light.studio_dator
-            name: Datorlampa
-            template:
-              - light
-              - icon_hue
-
-          - type: custom:button-card
-            entity: light.studio_group
-            name: Taklampor
+            entity: light.media_room_main_lights
+            name: Lights
             template:
               - light
               - icon_spot
 
           - type: custom:button-card
-            entity: switch.imac
-            name: Dator
+            entity: sensor.ps5
+            name: Playstation
             double_tap_action:
-              !include popup/studio_dator.yaml
+              !include popup/media_playstation.yaml
+            tap_action:   
+              action: call-service
+              service: switch.turn_on
+              data: {} 
+              target:
+                entity_id: switch.playstation
             template:
-              - base
-              - icon_imac
+              - base 
+              - icon_ps5
               - loader
-              - lock
-            variables:
-              lock: >
-                [[[
-                  let lock = states['input_boolean.imac_lock'];
-                  return !lock || lock.state;
-                ]]]
-              trigger: >
-                [[[
-                  let trigger = states['script.home_leave'];
-                  return !trigger || trigger;
-                ]]]
 
           - type: custom:button-card
-            entity: switch.gosund_monitors_switch
-            name: Monitorer
+            entity: cover.left_shade
+            name: Shades
             double_tap_action:
-              !include popup/studio_monitorer.yaml
+              !include popup/media_shades.yaml
             template:
-              - base
-              - icon_monitors
-              - circle
-              - loader
-            variables:
-              circle_input: >
-                [[[
-                  let volume = states['sensor.monitors_volume'];
-                  if (volume) return parseInt(volume.state);
-                ]]]
-              circle_input_unit: '%'
+              - shades
+              - icon_shades
+            tap_action:
+              action: call-service
+              service: cover.toggle
+              service_data:
+                entity_id: cover.media_room_shades 
 
       #################################################
       #                                               #
-      #                    SOVRUM                     #
+      #                    Living                     #
       #                                               #
       #################################################
 
       - type: grid
-        title: Sovrum
+        title: Living Room
         view_layout:
-          grid-area: sovrum
+          grid-area: living
         columns: 2
         cards:
 
           - type: custom:button-card
-            entity: light.sovrum_group
-            name: Sänglampor
+            entity: media_player.living_room
+            name: Sonos One
+            double_tap_action:
+              !include popup/studio_monitorer.yaml
             template:
-              - light
-              - icon_lamp
+              - icon_spotify
+              - conditional_media
+            variables:
+              circle_input: >
+                [[[
+                  if (entity) {
+                      return entity.state === 'playing'
+                          ? Math.round(entity.attributes.volume_level)
+                          : 0;
+                  }
+                ]]]
+              circle_input_unit: '%'
 
           - type: custom:button-card
-            entity: climate.ac
-            name: Klimat
+            entity: climate.home
+            name: A/C
+            tap_action:
+              action: more-info
             double_tap_action:
               !include popup/sovrum_klimat.yaml
             template:
@@ -259,38 +313,27 @@ views:
                           : Math.round(entity.attributes.current_temperature).toString();
                   }
                 ]]]
-              circle_input_unit: '°C'
+              circle_input_unit: '°F'
 
           - type: custom:button-card
-            entity: switch.ps5_635_power
-            name: Playstation
-            double_tap_action:
-              !include popup/sovrum_playstation.yaml
+            entity: media_player.plex_on_apple_tv
+            name: Plex
+            tap_action:
+              action: none
             template:
-              - base
-              - icon_ps5
-              - loader
-
-          - type: custom:button-card
-            entity: media_player.samsung
-            name: "Tv\u00B2"
-            double_tap_action:
-              !include popup/sovrum_tv2.yaml
-            template:
-              - base
-              - icon_tv
-              - loader
+              - conditional_media
+              - icon_plex
 
       #################################################
       #                                               #
-      #                     MEDIA                     #
+      #                     Playing                   #
       #                                               #
       #################################################
 
       - type: grid
-        title: Media
+        title: On Now
         view_layout:
-          grid-area: media
+          grid-area: playing
         columns: 1
         cards:
 
@@ -319,8 +362,8 @@ views:
                         state_not: Kök
                     card:
                       type: custom:button-card
-                      entity: sensor.plex_recently_added
-                      name: Senast tillagt
+                      entity: media_player.plex_plex_for_ios_pigeon 
+                      name: Plex
                       tap_action:
                         action: none
                       template:
@@ -409,68 +452,77 @@ views:
 
       #################################################
       #                                               #
-      #                    ÖVRIGT                     #
+      #                    Patio                      #
       #                                               #
       #################################################
 
       - type: grid
-        title: Övrigt
+        title: Patio
         view_layout:
-          grid-area: övrigt
+          grid-area: patio
         columns: 2
         cards:
-
           - type: custom:button-card
-            entity: light.badrum_group
-            name: Badrum
+            entity: light.patio_lights
+            name: Patio Lights
             template:
               - light
-              - icon_bathroom
+              - icon_spot
 
           - type: custom:button-card
-            entity: switch.gosund_fan_switch
-            name: "Fläkt\u00B2"
+            entity: fan.ceiling_fan
+            tap_action:
+              action: call-service
+              service: script.patio_fan_high
+              data: {}
+              target: {}
+            name: Fans
             double_tap_action:
-              !include popup/studio_flakt.yaml
+              !include popup/patio_fans.yaml
             template:
               - base
               - icon_fan2
               - loader
 
           - type: custom:button-card
-            entity: light.garderob_lampa
-            name: Garderob
+            entity: media_player.sonos_roam
+            name: Sonos Roam
+            double_tap_action:
+              !include popup/studio_monitorer.yaml
             template:
-              - light
-              - icon_closet
-
-          - type: custom:button-card
-            entity: light.hall_group
-            name: Hall
-            template:
-              - light
-              - icon_spot
+              - icon_spotify
+              - conditional_media
+            variables:
+              circle_input: >
+                [[[
+                  if (entity) {
+                      return entity.state === 'playing'
+                          ? Math.round(entity.attributes.volume_level)
+                          : 0;
+                  }
+                ]]]
+              circle_input_unit: '%'
 
       #################################################
       #                                               #
-      #                     HEMMA                     #
+      #                     Us                        #
       #                                               #
       #################################################
 
       - type: grid
-        title: Hemma
+        title: Us
         view_layout:
-          grid-area: hemma
+          grid-area: us
         columns: 2
         cards:
 
           - type: custom:button-card
-            entity: person.matte
-            name: Mattias
+            entity: person.jack
+            name: Jack
             triggers_update:
               - sensor.matte_last_changed
-            double_tap_action:
-              !include popup/hemma_mattias.yaml
+            tap_action:
+              !include popup/home_jack.yaml
             variables:
               retain: sensor.matte_last_changed
             template:
@@ -478,28 +530,28 @@ views:
               - circle
 
           - type: custom:button-card
-            entity: person.sanja
-            name: Sanja
+            entity: person.jacqueline
+            name: Jacqueline
             triggers_update:
-              - sensor.sanja_last_changed
-            double_tap_action:
-              !include popup/hemma_sanja.yaml
+              - sensor.jacqueline_last_changed
+            tap_action:
+              !include popup/home_jacqueline.yaml
             variables:
-              retain: sensor.sanja_last_changed
+              retain: sensor.jacqueline_last_changed
             template:
               - person
-              - circle
+              - circle 
 
-          - type: custom:button-card
-            entity: script.home_leave
-            name: Stäng allt
+          - type: custom:button-card 
+            entity: script.home_leave 
+            name: Heading Out
             template:
               - base
               - icon_away
 
           - type: custom:button-card
-            entity: script.home_arrive
-            name: Hemma
+            entity: script.home_night 
+            name: Goodnight
             template:
               - base
               - icon_home
@@ -521,7 +573,7 @@ views:
             tap_action:
               !include popup/footer_nas.yaml
             triggers_update:
-              - binary_sensor.nas_update_available
+              - update.nas_dsm_update
               - sensor.nas_volume_1_status
               - binary_sensor.nas_security_status
               - sensor.disk_use_percent
@@ -540,26 +592,28 @@ views:
 
           - type: custom:button-card
             name: >
-              <ha-icon icon="mdi:arrow-up-bold-circle-outline"></ha-icon> Uppdatera
+              <ha-icon icon="mdi:arrow-up-bold-circle-outline"></ha-icon> Updates
             tap_action:
               !include popup/footer_updates.yaml
             triggers_update:
               - sensor.hacs
               - sensor.docker_hub_beta
               - sensor.docker_hub
+              - sensor.template_updates
             variables:
               notify: >
                 [[[
                   let id = this._config.triggers_update;
                   if (id.every(e => states[e])) {
                       let hacs = parseInt(states[id[0]].state),
+                          other = parseInt(states[id[3]].state),
                           installed = hass.config.version,
                           latest = installed.includes('b')
                               ? states[id[1]].state
                               : states[id[2]].state;
 
                       if (latest.includes('.') && Number.isInteger(hacs))
-                          return hacs + (installed !== latest ? 1 : 0);
+                          return hacs + other + (installed !== latest ? 1 : 0);
                   }
                   return 0;
                 ]]]
@@ -567,7 +621,7 @@ views:
 
           - type: custom:button-card
             name: >
-              <ha-icon icon="mdi:robot-vacuum-variant"></ha-icon> Städa
+              <ha-icon icon="mdi:robot-vacuum-variant"></ha-icon> Roomba
             tap_action:
               !include popup/footer_vacuum.yaml
             triggers_update:
@@ -580,16 +634,16 @@ views:
                 ]]]
             template: footer
 
-          - type: custom:button-card
-            name: >
-              <ha-icon icon="mdi:chart-line-variant"></ha-icon> Historik
-            tap_action:
-              !include popup/footer_history.yaml
-            template: footer
+          # - type: custom:button-card
+          #   name: >
+          #     <ha-icon icon="mdi:chart-line-variant"></ha-icon> Historik
+          #   tap_action:
+          #     !include popup/footer_history.yaml
+          #   template: footer
 
           - type: custom:button-card
             name: >
-              <ha-icon icon="mdi:tablet"></ha-icon> Platta
+              <ha-icon icon="mdi:tablet"></ha-icon> Tablet
             tap_action:
               !include popup/footer_tablet.yaml
             variables:
@@ -602,7 +656,7 @@ views:
 
           - type: custom:button-card
             name: >
-              <ha-icon icon="mdi:router-wireless"></ha-icon> Router
+              <ha-icon icon="mdi:router-wireless"></ha-icon> Unifi
             tap_action:
               !include popup/footer_router.yaml
             triggers_update:

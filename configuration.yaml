@@ -1,59 +1,185 @@
 homeassistant:
-  name: Hem
-  latitude: !secret homeassistant_latitude
-  longitude: !secret homeassistant_longitude
-  elevation: !secret homeassistant_elevation
-  unit_system: metric
-  temperature_unit: C
-  time_zone: Europe/Stockholm
-  currency: SEK
-  packages: !include_dir_named packages
-  customize_domain:
-    automation:
-      initial_state: true
-  allowlist_external_dirs:
-    - /config
+  customize: !include customize.yaml
+  
+  auth_providers:
+    - type: trusted_networks
+      trusted_networks:
+        - 192.168.1.0/24
+    - type: homeassistant
 
+# Configure a default setup of Home Assistant (frontend, api, etc)
 default_config:
 
-frontend: !include themes.yaml
-template: !include sidebar.yaml
+# Uncomment this if you are using SSL/TLS, running in Docker container, etc.
+# http:
+#   base_url: example.duckdns.org:8123
 
-lovelace:
-  mode: yaml
-  resources:
-    [
-      { url: /hacsfiles/apexcharts-card/apexcharts-card.js,                         type: module },
-      { url: /hacsfiles/bar-card/bar-card.js,                                       type: module },
-      { url: /hacsfiles/button-card/button-card.js,                                 type: module },
-      { url: /hacsfiles/custom-icons/custom-icons.js,                               type: module },
-      { url: /hacsfiles/kiosk-mode/kiosk-mode.js,                                   type: module },
-      { url: /hacsfiles/lovelace-layout-card/layout-card.js,                        type: module },
-      { url: /hacsfiles/lovelace-more-info-card/more-info-card.js,                  type: module },
-      { url: /hacsfiles/lovelace-mushroom/mushroom.js,                              type: module },
-      { url: /hacsfiles/lovelace-slider-entity-row/slider-entity-row.js,            type: module },
-      { url: /hacsfiles/lovelace-xiaomi-vacuum-map-card/xiaomi-vacuum-map-card.js,  type: module },
-      { url: /hacsfiles/swipe-card/swipe-card.js,                                   type: module },
+# Discover some devices automatically
+discovery:
 
-      { url: '/local/marked.min.js?v=4.0.18',                                       type: module },
-      { url: '/local/vanilla-tilt.min.js?v=1.7.2',                                  type: module },
-      { url: '/local/fonts.css?v=2.1',                                              type: css }
-    ]
+#frontend:
+#  themes: !include_dir_merge_named themes
+  
+frontend: !include ui_lovelace_minimalist/dashboard/themes.yaml
 
-recorder:
-  db_url: !secret recorder_db_url
-  exclude:
-    entity_globs:
-      - sensor.browser_*
-
-logger:
-  default: warning
-  logs:
-    homeassistant.components.websocket_api: fatal
-    custom_components.monitor_docker.helpers: fatal
-
+# Sensors
 sensor:
+  # Weather prediction
+  #- platform: yr
+  - platform: sonos_upcoming_media
+    ip: 192.168.1.215
+    max: 2
+  - platform: sonarr_upcoming_media
+    api_key: f5ec1dd7cb68466d8ffac2b98eb2f432
+    host: 192.168.1.132
+    port: 8989
+    days: 7
+    ssl: false
+    max: 10
+  - platform: waste_connections
+    urlbase: https://api.recollect.net/api/places/E986C39C-C5CD-11EA-8DA2-6CE17286E7FE/services/903/events
+  - platform: command_line
+    unique_id: 1644163974631
+    name: ps5_sensor
+    command: 'python ./custom_sensors/ps5.py -q 192.168.1.203'
+    scan_interval: 30
+  - platform: template
+    sensors:
+      timer_alexa:
+        friendly_name: "Alexa Timer"
+        value_template: >
+          {% if states('sensor.jack_s_fire_next_timer')  != 'unavailable' %}
+            {{ ((as_timestamp(states('sensor.jack_s_fire_next_timer')) - as_timestamp(now()))) | int + 1 }}
+          {% else %}
+              0
+          {% endif %}
+        unit_of_measurement: Seconds
+        icon_template: hass:timer 
+  # Minimal configuration of the standard time and date sensor
   - platform: time_date
     display_options:
-      - time
-      - date
+      - 'date_time_iso'
+  # Build on the standard sensor to produce one that can be customized
+template:
+  - sensor:
+      - name: "Date and time"
+        state: "{{ as_timestamp(states('sensor.date_time_iso')) | timestamp_custom('%A %B %-d, %I:%M %p') }}"
+        icon: "mdi:calendar-clock"
+      - name: "Date"
+        state: "{{ as_timestamp(states('sensor.date_time_iso')) | timestamp_custom('%A %B %-d') }}"
+        icon: "mdi:calendar-clock"
+      - name: "Time"
+        state: "{{ as_timestamp(states('sensor.date_time_iso')) | timestamp_custom('%I:%M %p') }}"
+        icon: "mdi:calendar-clock"
+      - name: "PS5"
+        icon: "fab:playstation"
+        state: >
+          {% if is_state('sensor.ps5_sensor', 'ON') %}
+            Playing
+          {% elif is_state('sensor.ps5_sensor', 'STANDBY') %}
+            Standby
+          {% else %}
+            Off
+          {% endif %}
+  - sensor:
+    - unique_id: sidebar
+      state: template
+      attributes:
+        time: >
+          {% set hours = now().strftime('%-I') %}
+          {% set minutes = now().strftime('%M') %}
+          {% set ampm = now().strftime('%p') %}
+          <span class="time">
+            {{ hours }}<span class="time-colon">:</span>{{ minutes }}
+          </span>
+        datum: >
+          <span class="date">
+            {{ states('sensor.date') }}
+          </span>
+          <hr /> 
+        greet: >
+          <b>
+          {% set time = now().hour %}
+          {% if time <= 1 %} Good Night{{'\U0001F611'}}
+          {% elif time <= 3 %} Good Night{{'\U0001F62A'}}
+          {% elif time <= 5 %} Good Night{{'\U0001F634'}}
+          {% elif time <= 7 %} Good Morning {{'\U0001F4A9'}}
+          {% elif time <= 9 %} Good Morning {{'\u2615\uFE0F'}}
+          {% elif time <= 10 %} Good Morning {{'\U0001F642'}}
+          {% elif time <= 13 %} Good Afternoon {{'\U0001F60A'}}
+          {% elif time <= 15 %} Good Afternoon {{'\U0001F60E'}}
+          {% elif time <= 17 %} Good Afternoon {{'\U0001F44B\U0001F3FB'}}
+          {% elif time <= 19 %} Good Evening {{'\U0001F44B\U0001F3FB'}}
+          {% elif time <= 22 %} Good Evening {{'\U0001F60C'}}
+          {% elif time <= 23 %} Good Evening {{'\U0001F974'}}
+          {% else %} Good Evening {{'\U0001F974'}}
+          {% endif %}
+          </b>
+          <hr />
+          
+# Text to speech
+tts:
+  - platform: google_translate
+
+group: !include groups.yaml
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml
+alert: !include alert.yaml
+
+# Example configuration.yaml entry
+lutron_caseta:
+  - host: 192.168.1.233
+    keyfile: config/lutron_caseta/caseta.key
+    certfile: config/lutron_caseta/caseta.crt
+    ca_certs: config/lutron_caseta/caseta-bridge.crt
+
+binary_sensor:
+  - platform: template
+    sensors:
+      garage_open:
+        value_template: '{{ is_state("cover.garage_door", "open") and state_attr("sun.sun", "elevation") < 4 }}'
+        friendly_name: 'Garage is open at night'
+
+switch:
+  - platform: command_line
+    switches:
+      playstation:
+        value_template: >
+          {% if value == 'ON' %}
+            Playing
+          {% elif value == 'STANDBY' %}
+            Standby
+          {% else %}
+            Off
+          {% endif %}
+        command_state: 'python ./custom_sensors/ps5.py -q 192.168.1.203'
+        command_on: 'python ./custom_sensors/ps5.py -w -u -1928588545 192.168.1.203'
+
+monitor_docker:
+  - name: Docker
+    precision_cpu: 0
+    precision_memory_percentage: 0 
+    containers:
+      - Sonarr
+      - zwavejs
+      - Unifi-New
+      - Transmission
+      - HomeAssistant
+    rename: 
+      Sonarr: Sonarr
+      zwavejs: "Z-Wave JS"
+      Unifi-New: "Unifi"
+      Transmission: Transmission
+      HomeAssistant: "Home Assistant"
+    monitored_conditions:
+      - version
+      - containers_running
+      - containers_total
+      - state
+      - status
+      - memory_percentage
+      - 1cpu_percentage
+
+lovelace:
+  mode: storage

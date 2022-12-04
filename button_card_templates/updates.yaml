@@ -188,7 +188,7 @@ updates_other:
               : `${count} ${count == 1 ? variables.translate_update_available : variables.translate_updates_available} ${String.fromCodePoint('0x1f389')}`;
 
           return `
-            <ha-icon icon="mdi:update"></ha-icon> <span class="title">Övrigt</span><br>
+            <ha-icon icon="mdi:update"></ha-icon> <span class="title">Miscellaneous</span><br>
             <p class="subtitle">${subtitle}</p>
             <ul>${output}</ul>
           `;

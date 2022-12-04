@@ -11,7 +11,7 @@ action: fire-dom-event
 browser_mod:
   service: browser_mod.popup
   data:
-    title: UniFi Dream Machine
+    title: UniFi
     content:
       type: vertical-stack
       cards:
@@ -21,11 +21,11 @@ browser_mod:
             class: content
           entities:
 
-            - entity: binary_sensor.template_udm_internet
-              secondary_info: last-changed
+            - entity: update.unifi_gateway
+              name: Status
 
-            - entity: sensor.template_udm_cpu_temp
-              name: CPU Temperatur
+            - entity: sensor.docker_unifi_new_1cpu
+              name: CPU Usage
 
             - type: custom:bar-card
               width: 55%
@@ -42,11 +42,10 @@ browser_mod:
                   to: 999
               entity_row: true
               entities:
-                - entity: sensor.template_udm_cpu
-                - entity: sensor.template_udm_mem
-                - entity: sensor.template_udm_disk
+                - entity: sensor.docker_unifi_new_1cpu
+                - entity: sensor.docker_unifi_new_memory_percent
 
-            - entity: sensor.template_udm_uptime
+            - entity: sensor.docker_unifi_new_status
 
         - type: custom:mod-card
           card_mod:
@@ -60,19 +59,17 @@ browser_mod:
             type: horizontal-stack
             cards:
               - type: custom:button-card
-                name: Nätverksenheter
+                name: Network Devices
                 icon: mdi:devices
                 tap_action:
                   action: url
-                  url_path:
-                    !secret unifi_network
+                  url_path: https://192.168.1.132:8443/manage/default/clients
                 template: icon_name
 
               - type: custom:button-card
-                name: System
+                name: Dashboard
                 icon: mdi:cog
                 tap_action:
                   action: url
-                  url_path:
-                    !secret unifi_console
+                  url_path: https://192.168.1.132:8443/
                 template: icon_name

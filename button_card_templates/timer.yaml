@@ -1,0 +1,9 @@
+timer:
+  variables:
+    circle_input: >
+      [[[
+        if (entity) {
+            return entity.attributes.current_position
+        }
+      ]]]
+    circle_input_unit: '%'

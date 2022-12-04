@@ -2,10 +2,10 @@ action: fire-dom-event
 browser_mod:
   service: browser_mod.popup
   data:
-    title: Dammsugare
+    title: Vacuum Cleaner
     timeout: 300000
     style: >
-      --popup-max-width: calc(385px + 495px);
+      --popup-max-width: calc(385px);
       --primary-color: transparent;
     content:
       type: custom:mod-card
@@ -36,9 +36,12 @@ browser_mod:
               $hui-entities-card$:
                 .: |
                   .card-content {
-                    padding: var(--tablet-card-content-padding);
+                    padding: var(--tablet-popup-content-padding);
                     letter-spacing: normal;
                     padding-bottom: 0;
+                  }
+                  .header .card-header {
+                      padding: var(--tablet-popup-header-padding);
                   }
                 more-info-card:
                   $ha-card:
@@ -64,7 +67,7 @@ browser_mod:
             $xiaomi-vacuum-map-card:
               $: |
                 div.map-wrapper, div.controls-wrapper {
-                  padding: var(--tablet-card-content-padding);
+                  padding: var(--tablet-popup-content-padding);
                   padding-top: 0;
                   padding-bottom: 0;
                   letter-spacing: normal;
@@ -97,10 +100,10 @@ browser_mod:
         layout_type: custom:grid-layout
         layout:
           margin: 0
-          grid-template-columns: 385px 495px
+          grid-template-columns: 385px
           grid-template-rows: 1fr
           grid-template-areas: |
-            "info map"
+            "info"
           mediaquery:
             #phone
             "(max-width: 800px)":
@@ -108,7 +111,6 @@ browser_mod:
               grid-template-rows: repeat(2, 1fr)
               grid-template-areas: |
                 "info"
-                "map"
         cards:
 
           #################################################
@@ -122,14 +124,12 @@ browser_mod:
               grid-area: info
             cards:
             - type: entities
-              title: Översikt
+              title: Overview
               card_mod:
                 class: header
               entities:
 
-              - entity: vacuum.morty
-
-              - entity: sensor.morty_last_clean_end
+              - entity: vacuum.roomba
 
               - type: custom:bar-card
                 width: 55%
@@ -150,9 +150,9 @@ browser_mod:
                 entity_row: true
                 entities:
 
-                  - entity: vacuum.morty
+                  - entity: vacuum.roomba
                     attribute: battery_level
-                    name: Batteri
+                    name: Battery
                     icon: mdi:battery
 
                   - entity: sensor.template_vacuum_filter
@@ -164,13 +164,13 @@ browser_mod:
                   - entity: sensor.template_vacuum_sensors
 
               - type: custom:more-info-card
-                entity: vacuum.morty
+                entity: vacuum.roomba
 
             - type: horizontal-stack
               cards:
 
                 - type: custom:button-card
-                  entity: vacuum.morty
+                  entity: vacuum.roomba
                   icon: mdi:play-pause
                   tap_action:
                     action: call-service
@@ -192,7 +192,7 @@ browser_mod:
                   template: icon_only
 
                 - type: custom:button-card
-                  entity: vacuum.morty
+                  entity: vacuum.roomba
                   icon: mdi:battery-charging
                   tap_action:
                     action: call-service
@@ -212,7 +212,7 @@ browser_mod:
                     action: call-service
                     service: vacuum.send_command
                     service_data:
-                      entity_id: vacuum.morty
+                      entity_id: vacuum.roomba
                       command: app_goto_target
                       params: [16821,23105]
                   template: icon_only
@@ -223,47 +223,47 @@ browser_mod:
           #                                               #
           #################################################
 
-          - type: custom:xiaomi-vacuum-map-card
-            title: Kartläggning
-            view_layout:
-              grid-area: map
-            card_mod:
-              class: header
-            language: sv
-            entity: vacuum.morty
-            map_source:
-              camera: camera.vacuum_map
-            calibration_source:
-              camera: true
-            map_locked: true
-            map_modes:
-              - template: vacuum_clean_zone
-              - template: vacuum_clean_zone_predefined
-                predefined_selections:
-                  - zones: [[14895, 20640, 18409, 24058]]
-                    icon:
-                      name: mdi:silverware-fork-knife
-                      x: 16708
-                      y: 22291
-                  - zones: [[15208, 17278, 20204, 20980]]
-                    icon:
-                      name: mdi:bed
-                      x: 17706
-                      y: 19043
-                  - zones: [[18170, 20925, 23138, 25026]]
-                    icon:
-                      name: mdi:door
-                      x: 22293
-                      y: 21864
-                  - zones: [[21474, 24942, 27269, 28873]]
-                    icon:
-                      name: mdi:sofa
-                      x: 24401
-                      y: 26736
-                  - zones: [[17687, 24885, 21487, 28816]]
-                    icon:
-                      name: mdi:speaker
-                      x: 19757
-                      y: 26622
-              - template: vacuum_goto
-              - template: vacuum_follow_path
+          # - type: custom:xiaomi-vacuum-map-card
+          #   title: Kartläggning
+          #   view_layout:
+          #     grid-area: map
+          #   card_mod:
+          #     class: header
+          #   language: sv
+          #   entity: vacuum.morty
+          #   map_source:
+          #     camera: camera.vacuum_map
+          #   calibration_source:
+          #     camera: true
+          #   map_locked: true
+          #   map_modes:
+          #     - template: vacuum_clean_zone
+          #     - template: vacuum_clean_zone_predefined
+          #       predefined_selections:
+          #         - zones: [[14895, 20640, 18409, 24058]]
+          #           icon:
+          #             name: mdi:silverware-fork-knife
+          #             x: 16708
+          #             y: 22291
+          #         - zones: [[15208, 17278, 20204, 20980]]
+          #           icon:
+          #             name: mdi:bed
+          #             x: 17706
+          #             y: 19043
+          #         - zones: [[18170, 20925, 23138, 25026]]
+          #           icon:
+          #             name: mdi:door
+          #             x: 22293
+          #             y: 21864
+          #         - zones: [[21474, 24942, 27269, 28873]]
+          #           icon:
+          #             name: mdi:sofa
+          #             x: 24401
+          #             y: 26736
+          #         - zones: [[17687, 24885, 21487, 28816]]
+          #           icon:
+          #             name: mdi:speaker
+          #             x: 19757
+          #             y: 26622
+          #     - template: vacuum_goto
+          #     - template: vacuum_follow_path

@@ -1,8 +1,6 @@
-light:
+garage:
   template:
     - base
-    - circle
-    - loader
   double_tap_action:
     action: fire-dom-event
     browser_mod:
@@ -60,3 +58,13 @@ light:
         }
       ]]]
     circle_input_unit: '%'
+  styles:
+    grid:
+      - grid-template-areas: |
+          "icon  ."
+          "n     n"
+          "s     s"
+      - grid-template-columns: repeat(2, 1fr)
+      - grid-template-rows: auto repeat(2, min-content)
+      - gap: 1.3%
+      - align-items: start

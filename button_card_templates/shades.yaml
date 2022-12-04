@@ -1,4 +1,4 @@
-light:
+shades:
   template:
     - base
     - circle
@@ -22,41 +22,29 @@ light:
           entities: >
             [[[
               if (entity) {
-                  let lights = [],
+                  let shades = [],
                       id = Boolean(entity.attributes.entity_id)
                           ? [entity.entity_id].concat(entity.attributes.entity_id)
                           : [entity.entity_id];
 
                   for (let i = 0; i < id.length; i++) {
-                      lights.push({
-                          "type": "custom:mushroom-light-card",
+                      shades.push({
+                          "type": "custom:mushroom-cover-card",
                           "entity": id[i],
                           "fill_container": false,
                           "primary_info": "name",
                           "secondary_info": "state",
-                          "icon_type": "icon",
-                          "show_brightness_control": true,
-                          "use_light_color": true,
-                          "show_color_temp_control": true,
-                          "show_color_control": true,
-                          "collapsible_controls": true
+                          "icon_type": "icon"
                       });
                   }
-                  return lights;
+                  return shades;
               }
             ]]]
   variables:
     circle_input: >
       [[[
         if (entity) {
-            // if light group get brightness from child to remove bounce
-            let child = entity.attributes.entity_id,
-                brightness = child && states[child[0]].attributes.brightness
-                    ? Math.round(states[child[0]].attributes.brightness / 2.54)
-                    : Math.round(entity.attributes.brightness / 2.54);
-            return brightness === 0 && entity.state !== 'off'
-                ? 1
-                : brightness
+            return entity.attributes.current_position
         }
       ]]]
     circle_input_unit: '%'

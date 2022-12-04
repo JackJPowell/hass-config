@@ -2,7 +2,7 @@ action: fire-dom-event
 browser_mod:
   service: browser_mod.popup
   data:
-    title: Uppdateringar
+    title: Updates
     content:
       type: custom:mod-card
       card_mod:
@@ -22,7 +22,7 @@ browser_mod:
               }
               #root {
                 grid-gap: 0 !important;
-                padding: var(--tablet-card-content-padding);
+                padding: var(--tablet-popup-content-padding);
                 width: calc(100% - 4px);
               }
       card:
@@ -34,17 +34,17 @@ browser_mod:
             entity: sensor.current_version
             template: updates_hass
             variables:
-              latest: sensor.docker_hub
-              latest_beta: sensor.docker_hub_beta
+              latest: sensor.home_assistant_core_latest_release
+              latest_beta: sensor.home_assistant_core_latest_release_beta
               release_notes: sensor.hass_release_notes
               release_notes_beta: sensor.hass_release_notes_beta
 
           - type: custom:button-card
             entity: sensor.current_version
-            name: Uppdatera HASS
+            name: Update HASS
             variables:
-              latest: sensor.docker_hub
-              latest_beta: sensor.docker_hub_beta
+              latest: sensor.home_assistant_core_latest_release
+              latest_beta: sensor.home_assistant_core_latest_release_beta
             tap_action:
               action: call-service
               service: switch.turn_on
@@ -54,13 +54,13 @@ browser_mod:
 
           - type: custom:button-card
             entity: sensor.hacs
-            variables:
-              installed: sensor.hacs_installed
+            # variables:
+            #   installed: sensor.hacs_installed
             template: updates_hacs
 
           - type: custom:button-card
             entity: sensor.hacs
-            name: Öppna HACS
+            name: Open HACS
             template:
               - updates_hacs_icon_name
             tap_action:
@@ -76,23 +76,23 @@ browser_mod:
                       window.location.href = `/${hass.panels.hacs.url_path}`;
                     }
 
-          - type: custom:button-card
-            entity: sensor.template_updates
-            template: updates_other
+          # - type: custom:button-card
+          #   entity: sensor.template_updates
+          #   template: updates_other
 
-          - type: custom:button-card
-            entity: sensor.template_updates
-            name: Kontrollera
-            tap_action:
-              action: call-service
-              service: homeassistant.update_entity
-              service_data:
-                entity_id:
-                  - sensor.gosund_monitors_esphome_version
-                  - sensor.gosund_ac_esphome_version
-                  - sensor.gosund_fan_esphome_version
-                  - sensor.updates_esphome_latest
-                  - sensor.updates_kemper
-                  - sensor.udm_unifios
-                  - update.nas_dsm_update
-            template: updates_other_icon_name
+          # - type: custom:button-card
+          #   entity: sensor.template_updates
+          #   name: Kontrollera
+          #   tap_action:
+          #     action: call-service
+          #     service: homeassistant.update_entity
+          #     service_data:
+          #       entity_id:
+          #         - sensor.gosund_monitors_esphome_version
+          #         - sensor.gosund_ac_esphome_version
+          #         - sensor.gosund_fan_esphome_version
+          #         - sensor.updates_esphome_latest
+          #         - sensor.updates_kemper
+          #         - sensor.udm_unifios
+          #         - update.nas_dsm_update
+          #   template: updates_other_icon_name

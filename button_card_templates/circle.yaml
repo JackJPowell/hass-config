@@ -193,6 +193,7 @@ circle:
             * * * * * * * * * * * * * * * * * */
 
             else if (variables.state_on) {
+                console.log(state, input,unit)
                 return circle(state, input, unit);
             }
         }

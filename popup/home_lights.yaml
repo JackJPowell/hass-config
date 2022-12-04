@@ -1,0 +1,59 @@
+action: fire-dom-event
+browser_mod:
+  service: browser_mod.popup
+  data:
+    title: House Lights
+    content:
+      type: vertical-stack
+      cards:
+      - type: custom:mushroom-title-card
+        title: Lights
+        alignment: start
+      - type: custom:mushroom-light-card
+        entity: light.media_room_main_lights
+        name: Turn All Lights Off
+        icon: mdi:lightbulb-group
+        primary_info: name
+        secondary_info: none
+        tap_action:
+          action: call-service
+          service: light.turn_off
+          data: {}
+          target:
+            entity_id: light.all_lights
+      - type: custom:mushroom-light-card
+        entity: light.media_room_main_lights
+        name: Media Room
+        icon: mdi:light-recessed
+      - type: custom:mushroom-light-card
+        entity: light.lamp_posts
+        name: Lamp Posts
+        icon: mdi:post-lamp
+      - type: custom:mushroom-light-card
+        entity: light.bathroom
+        name: Bathroom
+        icon: mdi:light-recessed
+      - type: custom:mushroom-light-card
+        entity: light.flood
+        name: Flood
+        icon: mdi:light-flood-down
+      - type: custom:mushroom-light-card
+        entity: light.entry_way
+        name: Entry Lights
+        icon: mdi:light-recessed
+      - type: custom:mushroom-light-card
+        entity: light.patio_sconces
+        name: Patio Sconces
+        icon: mdi:wall-sconce
+      - type: custom:mushroom-light-card
+        entity: light.bathroom_sconces
+        name: Bathroom Sconces
+        icon: mdi:wall-sconce
+      - type: custom:mushroom-light-card
+        entity: light.hall
+        name: Hall Lights
+        icon: mdi:light-recessed
+      - type: custom:mushroom-light-card
+        entity: light.string_lights
+        name: String Lights
+        icon: mdi:string-lights

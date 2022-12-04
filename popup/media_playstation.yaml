@@ -9,7 +9,6 @@ browser_mod:
       card_mod:
         class: content
       entities:
-
-        - entity: switch.ps5_635_power
+        - entity: sensor.ps5
           name: Playstation 5
           secondary_info: last-changed

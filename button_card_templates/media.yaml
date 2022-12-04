@@ -189,7 +189,7 @@ conditional_media:
       - overflow: visible
     card:
       - padding: 5.75% 5.25% 0 5.75%
-      - border-radius: calc(var(--button-card-border-radius) / 2)
+      - border-radius: var(--button-card-border-radius)
       - background: rgba(115, 115, 115, 0.2) center center/cover no-repeat
       - background-image: &media_background_image >
           [[[

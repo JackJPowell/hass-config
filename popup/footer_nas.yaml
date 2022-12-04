@@ -20,8 +20,11 @@ browser_mod:
                 hui-entities-card:
                   $: |
                     .card-content {
-                      padding: var(--tablet-card-content-padding);
+                      padding: var(--tablet-popup-content-padding);
                       padding-bottom: 0.8em;
+                    }
+                    .header .card-header {
+                      padding: var(--tablet-popup-header-padding);
                     }
                     ha-card {
                       border-right: 1.5px solid rgba(0, 0, 0, 0.2);
@@ -77,28 +80,15 @@ browser_mod:
               class: header
             entities:
               - entity: sensor.current_version
-                name: Installerad
+                name: Version
                 icon: mdi:home-assistant
 
-              - entity: switch.docker_watchtower
-                name: Watchtower
-                icon: cil:docker-watchtower
-
-              - entity: sensor.template_hass_next_release
-
-              - entity: sensor.databas
-                icon: mdi:database
-
-              - entity: sensor.home_assistant_log_size
-                name: Loggfil
-                icon: mdi:file-document
-
-              - type: attribute
-                entity: sensor.docker_home_assistant
-                attribute: uptime
-                format: relative
-                name: Senast omstart
-                icon: mdi:update
+              # - type: attribute
+              #   entity: sensor.docker_home_assistant
+              #   attribute: uptime
+              #   format: relative
+              #   name: Senast omstart
+              #   icon: mdi:update
 
               - type: custom:bar-card
                 width: 55%
@@ -115,21 +105,18 @@ browser_mod:
                     to: 999
                 entity_row: true
                 entities:
-
-                  - entity: sensor.docker_home_assistant
-                    attribute: cpu_percentage
-                    name: Processor
+                  - entity: sensor.docker_homeassistant_1cpu
+                    name: CPU
                     icon: mdi:chip
 
-                  - entity: sensor.docker_home_assistant
-                    attribute: memory_percentage
-                    name: Minne
+                  - entity: sensor.docker_homeassistant_memory_percent
+                    name: Memory
                     icon: mdi:memory
 
               - type: custom:hui-horizontal-stack-card
                 cards:  
                   - type: custom:button-card
-                    name: Serveromstart
+                    name: Restart Server
                     icon: mdi:reload
                     tap_action:
                       action: call-service
@@ -160,35 +147,28 @@ browser_mod:
               class: header
             entities:
 
-              - type: custom:bar-card
-                width: 55%
-                height: 2em
-                decimal: 0
-                unit_of_measurement: '%'
-                positions: *bar_card_positions
-                severity: *bar_card_severity
-                entity_row: true
-                entities:
+              # - type: custom:bar-card
+              #   width: 55%
+              #   height: 2em
+              #   decimal: 0
+              #   unit_of_measurement: '%'
+              #   positions: *bar_card_positions
+              #   severity: *bar_card_severity
+              #   entity_row: true
+              #   entities:
+              #     - entity: sensor.albatross_cpu_load_total
+              #       name: Processor
 
-                  - entity: sensor.docker_1cpu
-                    name: Processor
-
-                  - entity: sensor.docker_memory_percent
-                    name: Minne
+              #     - entity: sensor.albatross_memory_usage_real
+              #       name: Memory
 
               - entity: sensor.docker_containers_total
-                name: Containrar Totalt
+                name: Total Containers
 
               - entity: sensor.docker_containers_running
-                name: Containrar Körs
+                name: Containers Running
 
-              - entity: sensor.docker_containers_paused
-                name: Containrar Pausade
-
-              - entity: sensor.docker_containers_stopped
-                name: Containrar Stoppade
-
-              - entity: switch.docker_transmission_seed
+              - entity: switch.docker_transmission
 
             footer:
               type: custom:apexcharts-card
@@ -247,11 +227,11 @@ browser_mod:
                 type: area
                 fill_raw: last
               series:
-                - entity: sensor.nas_download_throughput
-                  name: Ned
+                - entity: sensor.albatross_network_down
+                  name: Down
                   color: green
-                - entity: sensor.nas_upload_throughput
-                  name: Upp
+                - entity: sensor.albatross_network_up
+                  name: Up
                   color: '#385581'
 
           #################################################
@@ -263,7 +243,7 @@ browser_mod:
           - type: entities
             view_layout:
               grid-area: nas
-            title: Synology DS918+
+            title: Synology DS1813+
             show_header_toggle: false
             card_mod:
               class: header
@@ -272,18 +252,20 @@ browser_mod:
                   border: none !important;
                 }
             entities:
-              - entity: sensor.template_nas_status
+              - entity: binary_sensor.albatross_security_status
+                name: Security Status
 
-              - entity: binary_sensor.nas_security_status
-                name: Säkerhetsstatus
+              - entity: update.albatross_dsm_update
+                name: Status
+                icon: mdi:security
 
-              - entity: sensor.nas_volume_1_average_disk_temp
+              - entity: sensor.albatross_temperature
 
-              - entity: sensor.last_boot
-                name: Senast omstart
+              - entity: sensor.albatross_last_boot
+                name: Last Boot
 
-              - entity: binary_sensor.nas_update_available
-                name: Uppdatering
+              # - entity: binary_sensor.nas_update_available
+              #   name: Update Available
 
               - type: custom:bar-card
                 width: 55%
@@ -294,56 +276,47 @@ browser_mod:
                 severity: *bar_card_severity
                 entity_row: true
                 entities:
-
-                  - entity: sensor.processor_use
+                  - entity: sensor.albatross_cpu_load_total
                     name: Processor
                     tap_action:
                       action: call-service
                       service: homeassistant.update_entity
                       service_data:
-                        entity_id: sensor.processor_use
+                        entity_id: sensor.albatross_cpu_load_total
 
-                  - entity: sensor.memory_use_percent
-                    name: Minne - 4GB
+                  - entity: sensor.albatross_memory_usage_real
+                    name: Memory - 4GB
                     tap_action:
                       action: call-service
                       service: homeassistant.update_entity
                       service_data:
-                        entity_id: sensor.memory_use_percent
-
-                  - entity: sensor.disk_use_percent
-                    name: Lagring - 10.5TB
-                    tap_action:
-                      action: call-service
-                      service: homeassistant.update_entity
-                      service_data:
-                        entity_id: sensor.disk_use_percent
+                        entity_id: sensor.albatross_memory_usage_real
 
               - type: custom:hui-horizontal-stack-card
                 cards:
                   - type: custom:button-card
-                    name: Starta om
-                    icon: mdi:restart-alert
+                    name: Restart...
+                    icon: mdi:restart
                     tap_action:
                       confirm: >
                         [[[
                           return `[[[
-                            if (window.confirm('Är du säker på att du vill starta om NAS?')) {
-                              hass.callService('button', 'press', { entity_id: 'button.nas_reboot' });
+                            if (window.confirm('Are you sure you want to restart the NAS?')) {
+                              hass.callService('button', 'press', { entity_id: 'button.albatross_reboot' });
                             }
                           ]]]`
                         ]]]
                     template: icon_name
 
                   - type: custom:button-card
-                    name: Stäng av...
+                    name: Shutdown...
                     icon: mdi:alert
                     tap_action:
                       confirm: >
                         [[[
                           return `[[[
-                            if (window.confirm('Är du säker på att du vill stänga av NAS?')) {
-                              hass.callService('button', 'press', { entity_id: 'button.nas_shutdown' });
+                            if (window.confirm('Are you sure you want to shutdown the NAS?')) {
+                              hass.callService('button', 'press', { entity_id: 'button.albatross_shutdown' });
                             }
                           ]]]`
                         ]]]

@@ -591,6 +591,7 @@ views:
             template: footer
 
           - type: custom:button-card
+            entity: sensor.template_updates
             name: >
               <ha-icon icon="mdi:arrow-up-bold-circle-outline"></ha-icon> Updates
             tap_action:

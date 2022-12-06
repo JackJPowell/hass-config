@@ -1,3 +1,10 @@
+homeassistant:
+  customize:
+    sensor.nas_volume_1_average_disk_temp:
+      friendly_name: Disktemperatur
+    sensor.processor_use_percent:
+      icon: mdi:chip
+
 sensor:
   - platform: systemmonitor
     resources:
@@ -78,3 +85,12 @@ automation:
       above: 50
     action:
       service: shell_command.purge_log
+
+  - alias: backup_ha_monthly
+    trigger:
+      platform: time
+      at: 04:00:00
+    condition: >
+      {{ now().day == 1 }}
+    action:
+      service: backup.create

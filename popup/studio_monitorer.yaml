@@ -3,6 +3,10 @@ browser_mod:
   service: browser_mod.popup
   data:
     title: Monitorer
+    card_mod:
+      style:
+        #popup header
+        .:
     content:
 
       type: vertical-stack
@@ -20,6 +24,7 @@ browser_mod:
             - type: custom:slider-entity-row
               card_mod:
                 style:
+                  # icon color mute and max
                   .: |
                     :host {
                       --paper-item-icon-color:
@@ -28,11 +33,12 @@ browser_mod:
                         {% elif states(config.entity) | int == 0 %}
                           #9da0a2
                         {% elif states(config.entity) | int < 60 %}
-                          #3182b7
+                          initial
                         {% else %}
                           red
                         {% endif %};
                       }
+                  # full width slider
                   hui-generic-entity-row$: |
                     div {
                       flex: auto !important;

@@ -99,6 +99,7 @@ browser_mod:
                   border-radius: 0;
                   transition: none;
                   margin-bottom: -4px !important;
+                  height: 25em !important;
                 }
               ha-map$: |
                 #map {

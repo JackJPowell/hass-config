@@ -22,6 +22,7 @@ browser_mod:
               hide_state: false
               card_mod:
                 style:
+                  # full width slider
                   hui-generic-entity-row$: |
                     div {
                       flex: auto !important;

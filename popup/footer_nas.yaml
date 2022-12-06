@@ -65,11 +65,7 @@ browser_mod:
                 "nas"
         cards:
 
-          #################################################
-          #                                               #
-          #                HOME ASSISTANT                 #
-          #                                               #
-          #################################################
+        ### HOME ASSISTANT
 
           - type: entities
             view_layout:
@@ -123,29 +119,35 @@ browser_mod:
                       service: homeassistant.restart
                     template: icon_name
 
-                  - type: custom:button-card
-                    name: Container
-                    icon: mdi:reload
-                    tap_action:
-                      action: call-service
-                      service: shell_command.restart_container
-                    template: icon_name
+                - type: custom:button-card
+                  name: Container
+                  icon: mdi:reload
+                  tap_action:
+                    action: call-service
+                    service: browser_mod.sequence
+                    service_data:
+                      sequence:
+                        - service: browser_mod.notification
+                          data:
+                            message: Startar om container...
+                        - service: homeassistant.save_persistent_states
+                        - service: browser_mod.delay
+                          data:
+                            time: 3000
+                        - service: shell_command.restart_container
+                  template: icon_name
 
-          #################################################
-          #                                               #
-          #                    DOCKER                     #
-          #                                               #
-          #################################################
+        ### DOCKER
 
-          - type: entities
-            view_layout:
-              grid-area: tablet
-            title: Docker
-            state_color: true
-            show_header_toggle: false
-            card_mod:
-              class: header
-            entities:
+        - type: entities
+          view_layout:
+            grid-area: docker
+          title: Docker
+          state_color: true
+          show_header_toggle: false
+          card_mod:
+            class: header
+          entities:
 
               # - type: custom:bar-card
               #   width: 55%
@@ -234,11 +236,7 @@ browser_mod:
                   name: Up
                   color: '#385581'
 
-          #################################################
-          #                                               #
-          #                      NAS                      #
-          #                                               #
-          #################################################
+        ### NAS
 
           - type: entities
             view_layout:

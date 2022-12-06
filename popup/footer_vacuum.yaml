@@ -113,11 +113,7 @@ browser_mod:
                 "info"
         cards:
 
-          #################################################
-          #                                               #
-          #                 INSTÄLLNINGAR                 #
-          #                                               #
-          #################################################
+        ### ÖVERSIKT
 
           - type: vertical-stack
             view_layout:
@@ -166,9 +162,18 @@ browser_mod:
               - type: custom:more-info-card
                 entity: vacuum.roomba
 
-            - type: horizontal-stack
+          - type: custom:mod-card
+            card_mod:
+              style:
+                # horizontal bottom buttons
+                hui-horizontal-stack-card$: |
+                  #root {
+                    justify-content: space-evenly !important;
+                    padding: var(--tablet-popup-button-padding);
+                  }
+            card:
+              type: horizontal-stack
               cards:
-
                 - type: custom:button-card
                   entity: vacuum.roomba
                   icon: mdi:play-pause
@@ -183,12 +188,7 @@ browser_mod:
                         ]]]`
                       ]]]
                     service_data:
-                      entity_id: >
-                        [[[
-                          return `[[[
-                            return entity.entity_id;
-                          ]]]`
-                        ]]]
+                      entity_id: vacuum.morty
                   template: icon_only
 
                 - type: custom:button-card
@@ -198,12 +198,7 @@ browser_mod:
                     action: call-service
                     service: vacuum.return_to_base
                     service_data:
-                      entity_id: >
-                        [[[
-                          return `[[[
-                            return entity.entity_id;
-                          ]]]`
-                        ]]]
+                      entity_id: vacuum.morty
                   template: icon_only
 
                 - type: custom:button-card
@@ -217,11 +212,7 @@ browser_mod:
                       params: [16821,23105]
                   template: icon_only
 
-          #################################################
-          #                                               #
-          #                 KARTLÄGGNING                  #
-          #                                               #
-          #################################################
+        ### KARTLÄGGNING
 
           # - type: custom:xiaomi-vacuum-map-card
           #   title: Kartläggning

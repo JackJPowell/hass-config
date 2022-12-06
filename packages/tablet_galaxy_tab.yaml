@@ -17,10 +17,6 @@ homeassistant:
       icon: mdi:update
     sensor.galaxy_tab_a_battery:
       friendly_name: Batteri
-    sensor.nas_volume_1_average_disk_temp:
-      friendly_name: Disktemperatur
-    sensor.processor_use_percent:
-      icon: mdi:chip
 
 template:
   - sensor:
@@ -73,7 +69,7 @@ automation:
     id: '3972668118831'
     trigger:
       platform: numeric_state
-      entity_id: sensor.galaxy_tab_a_battery_level
+      entity_id: sensor.galaxy_tab_a_battery
       below: 50
     action:
       service: notify.all_devices
@@ -101,12 +97,16 @@ automation:
         - service: switch.turn_off
           target:
             entity_id: switch.galaxy_tab_a_screensaver
-        - service: light.turn_on
+        - service: number.set_value
           target:
-            entity_id: light.galaxy_tab_a_screen
+            entity_id: number.galaxy_tab_a_screen_brightness
           data:
-            brightness_pct: >
-              {{ iif(is_state('sun.sun', 'above_horizon'), 90, 65) }}
+            value: >
+              {% set day_percent = 90 %}
+              {% set night_percent = 65 %}
+              {% set day_convert = ((day_percent * 255) / 100) | int %}
+              {% set night_convert = ((night_percent * 255) / 100) | int %}
+              {{ iif(is_state('sun.sun', 'above_horizon'), day_convert, night_convert) }}
       else:
         - service: switch.turn_on
           target:
@@ -115,4 +115,4 @@ automation:
             minutes: 15
         - service: browser_mod.close_popup
           data:
-            deviceID: dd239c79-406b9d77
+            browser_id: tablet

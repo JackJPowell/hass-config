@@ -22,9 +22,9 @@ switch:
         value_template: >
           {{ is_state('switch.imac_wol', 'on') }}
         turn_on:
-          - service: switch.toggle
-            target:
-              entity_id: switch.switchbot_mqtt
+          - service: browser_mod.notification
+            data:
+              message: Dator måste manuellt slås på!
           - service: light.turn_on
             target:
               entity_id: light.studio_dator
@@ -85,8 +85,8 @@ template:
   - binary_sensor:
       - unique_id: imac_vpn
         state: >
-          {{ is_state('switch.imac', 'on') and
-          states('sensor.imac_ip') != states('sensor.myip') }}
+          {{ is_state('switch.imac', 'on') and states('sensor.imac_ip')
+          not in [states('sensor.myip'), 'unknown'] }}
         attributes:
           friendly_name: VPN
           icon: >
@@ -96,7 +96,7 @@ template:
   - sensor:
       - unique_id: imac_macintosh_hd
         state: >
-          {{ 100 - states('sensor.mattias_imac_storage') | float }}
+          {{ 100 - states('sensor.imac_storage') | float }}
         attributes:
           friendly_name: Macintosh HD
           icon: cil:imac-ssd
@@ -132,10 +132,10 @@ automation:
       to: 'on'
     condition:
       condition: state
-      entity_id: switch.imac
+      entity_id: binary_sensor.imac_active
       state: 'on'
     action:
-      service: notify.mobile_app_mattias_imac
+      service: notify.mobile_app_imac
       data:
         message: Rörelse i hallen detekterat
         title: Home Assistant

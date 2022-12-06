@@ -10,19 +10,43 @@ homeassistant:
       device_class: tv
     media_player.spotify:
       friendly_name: Spotify
+    switch.ps5_635_power:
+      friendly_name: PS5
 
 script:
   samsung_tv_energy_saving:
     alias: Eko-läge
     icon: mdi:leaf
     sequence:
+      - service: browser_mod.notification
+        data:
+          duration: 8000
+          message: Ställer in eko-läge på Tv i sovrummet...
       - service: media_player.play_media
         target:
           entity_id: media_player.samsung
         data:
           media_content_type: send_key
           media_content_id: >
-            KEY_MENU+1500+KEY_DOWN+500+KEY_DOWN+500+KEY_DOWN+500+KEY_ENTER+1000+KEY_DOWN+500+KEY_DOWN+500+KEY_DOWN+500+KEY_DOWN+500+KEY_ENTER+1000+KEY_ENTER+1000+KEY_DOWN+500+KEY_DOWN+500+KEY_ENTER+1000+KEY_HOME+500+KEY_HOME+500
+            {% set sequence = [
+              'KEY_MENU', '1600',
+              'KEY_DOWN', '400',
+              'KEY_DOWN', '400',
+              'KEY_DOWN', '400',
+              'KEY_ENTER', '900',
+              'KEY_DOWN', '400',
+              'KEY_DOWN', '400',
+              'KEY_DOWN', '400',
+              'KEY_ENTER', '900',
+              'KEY_ENTER', '400',
+              'KEY_DOWN', '400',
+              'KEY_DOWN', '400',
+              'KEY_ENTER', '400',
+              'KEY_HOME', '400',
+              'KEY_HOME'
+            ] %}
+
+            {{ sequence | join('+') }}
 
   bedroom_tv_night:
     alias: Nattläge

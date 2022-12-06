@@ -7,17 +7,12 @@ browser_mod:
       type: custom:mod-card
       card_mod:
         style:
-          .: |
-            :host .content {
-              width: 100%;
-            }
           hui-grid-card:
             $: |
-              button-card:nth-child(2),
-              button-card:nth-child(4) {
+              button-card:nth-child(2) {
                 margin: 0.6em 0 2.1em 0.8em;
               }
-              button-card:nth-child(6) {
+              button-card:nth-child(4) {
                 margin: 0.6em 0 0.5em 0.8em;
               }
               #root {
@@ -47,10 +42,18 @@ browser_mod:
               latest_beta: sensor.home_assistant_core_latest_release_beta
             tap_action:
               action: call-service
-              service: switch.turn_on
+              service: browser_mod.sequence
               service_data:
-                entity_id: switch.docker_watchtower
+                sequence:
+                  - service: browser_mod.notification
+                    data:
+                      message: Startar watchtower...
+                  - service: switch.turn_on
+                    data:
+                      entity_id: switch.docker_watchtower
             template: updates_hass_icon_name
+
+          ############################################
 
           - type: custom:button-card
             entity: sensor.hacs

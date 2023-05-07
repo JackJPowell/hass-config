@@ -1,0 +1,179 @@
+action: fire-dom-event
+browser_mod:
+  service: browser_mod.popup
+  data:
+    title: Spotify
+    style: >
+      --popup-max-width: calc(570px + 570px);
+      --ha-card-border-radius: 0;
+    content:
+      type: custom:mod-card
+      card_mod:
+        style:
+          layout-card:
+            $grid-layout:
+              $:
+                .: |
+                  #root {
+                      margin: -24px 0 !important;
+                  }
+                hui-entities-card:
+                  $: |
+                    .card-content {
+                      padding: var(--tablet-popup-content-padding);
+                      padding-bottom: 0.8em;
+                    }
+                    .header .card-header {
+                      padding: var(--tablet-popup-header-padding);
+                    }
+                    ha-card {
+                      border-right: 1.5px solid rgba(0, 0, 0, 0.2);
+                      border-radius: 0;
+                      transition: none;
+                    }
+                    /* portrait */
+                    @media screen and (max-width: 1200px) {
+                      ha-card {
+                        border-right: none;
+                        border-bottom: 1.5px solid rgba(0, 0, 0, 0.2);
+                      }
+                    }
+                  $hui-horizontal-stack-card:
+                    $: |
+                      #root {
+                        justify-content: space-evenly;
+                        margin-top: 1.7em;
+                        max-width: 82vw; /* iphonex */
+                      }
+      card:
+        type: custom:layout-card
+        layout_type: custom:grid-layout
+        layout:
+          margin: 0
+          grid-template-columns: 570px 570px
+          grid-template-rows: 1fr
+          grid-template-areas: |
+            "player playlist"
+          mediaquery:
+            #portrait
+            "(max-width: 1200px)":
+              grid-template-columns: 1fr
+              grid-template-rows: repeat(2, 1fr)
+              grid-template-areas: |
+                "player"
+                "playlist"
+        cards:
+
+          #################################################
+          #                                               #
+          #                Spotify Player                 #
+          #                                               #
+          #################################################
+
+          - type: entities
+            view_layout:
+              grid-area: player
+            show_header_toggle: false
+            card_mod:
+              class: header
+            entities:
+            - type: 'custom:mini-media-player'
+              artwork: full-cover
+              entity: media_player.spotify
+              hide:
+                power: true
+                progress: false
+                runtime: false
+                volume: true
+              style:
+                mmp-progress$: |
+                  .mmp-progress__duration__remaining {
+                    margin-left: 5px;
+                  }
+                .: |
+                  :host {
+                    left: 46% !important;
+                    top: 39.8% !important;
+                    width: 33% !important;
+                    height: 62.3% !important;
+                  }
+                  ha-card{
+                    border-radius: 1vw !important;
+                    overflow: hidden !important;
+                    height: 100%;
+                    width: 500px;
+                    margin: 20px 25px;
+                  }
+                  :host .mmp__bg {
+                    border-radius: 20px;
+                  }
+                mmp-progress$paper-progress$: |
+                  #primaryProgress {
+                    background: #fff !important;
+                    border-top-right-radius: 3px;
+                    border-bottom-right-radius: 3px;
+                  }
+
+
+
+
+          #################################################
+          #                                               #
+          #             Spotify Playlist                  #
+          #                                               #
+          #################################################
+
+          - type: entities
+            view_layout:
+              grid-area: playlist
+            state_color: true
+            show_header_toggle: false
+            card_mod:
+              class: header
+            entities:
+            - type: 'custom:spotify-card'
+              limit: 10
+              playlist_type: featured
+              display_style: list
+              device: Living Room Speaker
+              default_device: Living Room Speaker
+              known_connect_devices: 
+                - id: d7a4c766790741bd87618552175956b0ab19b31e
+                  name: Living Room Speaker
+                  entity_id: media_player.living_room_speaker
+              always_play_random_song: true
+              name: Spotify
+              style: |
+                :host {
+                    left: 79.5%;
+                    top: 39.8%;
+                    width: 31%;
+                    height: 62.3%;
+                    border-radius: 1vw;
+                }
+                #header{
+                    display:none !important;
+                }
+                #content{
+                    border:none !important;
+                    background: transparent;
+                }
+                .playback-controls{
+                    display:none !important;
+                }
+                #header-track{
+                    display:none;
+                }
+                .list-item > p{
+                    white-space: nowrap;
+                        overflow: hidden;
+                }
+                .list-item{
+                    border-radius: 0.2vw;
+                    overflow:hidden;
+                    border:none !important;
+                    margin-bottom:2px;
+                    background: transparent;
+                    border-radius: 8px; 
+                    margin: 5px 0px;
+                }

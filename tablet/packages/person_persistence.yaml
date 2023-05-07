@@ -1,0 +1,57 @@
+homeassistant:
+  customize:
+    person.jack:
+      entity_picture: /local/jack.png
+    device_tracker.iphone:
+      entity_picture: /local/device_tracker.svg
+    person.jacqueline:
+      entity_picture: /local/jacqueline.jpeg
+
+person:
+  - name: Jack
+    id: jack
+    device_trackers:
+      - device_tracker.iphone_jack
+      - device_tracker.iphone_jack_app
+
+  - name: Jacqueline
+    id: jacqueline
+    device_trackers:
+      - device_tracker.iphone_jacqueline
+      - device_tracker.iphone_jacqueline_app
+
+mqtt:
+  sensor:
+    - name: jack_last_changed
+      state_topic: homeassistant/persistence/jack
+      value_template: >
+        {{ value | replace(' ', 'T') }}
+
+    - name: jacqueline_last_changed
+      state_topic: homeassistant/persistence/jacqueline
+      value_template: >
+        {{ value | replace(' ', 'T') }}
+
+automation:
+  - alias: person_home
+    id: '8423590985012'
+    mode: parallel
+    trigger:
+      platform: state
+      entity_id:
+        - person.jack
+        - person.jacqueline
+      from:
+        - home
+        - not_home
+      to:
+        - home
+        - not_home
+    action:
+      service: mqtt.publish
+      data:
+        topic_template: >
+          homeassistant/persistence/{{ trigger.to_state.name | lower }}
+        payload_template: >
+          {{ now() }}
+        retain: true

@@ -1,0 +1,25 @@
+action: fire-dom-event
+browser_mod:
+  service: browser_mod.popup
+  data:
+    title: Patio Fans
+    content:
+      type: vertical-stack
+      cards:
+        - type: entities
+          state_color: true
+          card_mod:
+            class: content
+          entities:
+            - entity: fan.ceiling_fan
+              secondary_info: last-changed
+              tap_action:
+                action: call-service
+                service: script.patio_fan_high
+                data: {}
+                target: {}
+              hold_action:
+                action: call-service
+                service: script.patio_fan_off
+                data: {}
+                target: {}

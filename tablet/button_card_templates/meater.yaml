@@ -1,0 +1,18 @@
+meater:
+  template:
+    - base
+    - circle
+  state_display: >
+    [[[
+      if (entity) {
+          return states['timer.meater'].remaining;
+      }
+      return variables.translate_unknown;
+    ]]]
+  variables:
+    circle_input: >
+      [[[
+          let doneness = Math.round((states['sensor.meater_probe_internal'].state / states['sensor.meater_probe_target'].state * 100));
+          return doneness
+      ]]]
+    circle_input_unit: '%'

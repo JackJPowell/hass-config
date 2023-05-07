@@ -1,0 +1,274 @@
+sidebar:
+  show_state: false
+  show_icon: false
+  tap_action:
+    action: none
+  name: >
+    [[[
+      if (entity) {
+          let attr = [];
+          for (let [k, value] of Object.entries(entity.attributes))
+              window.navigator.userAgent.match(/iPhone/i)
+                  ? k !== 'time' && k !== 'date' && value !== false && (attr += `<p>${k === 'greet' ? `<span class="iphone">${value}</span>` : `${value}`}</p>`)
+                  : value !== false && (attr += `<p>${value}</p>`);
+          return attr;
+      }
+    ]]]
+  extra_styles: >
+    #card {
+      padding: 0;
+      border-width: 0;
+      font-family: SF Pro Display, Roboto, system-ui;
+      border-width: 0;
+    }
+    #name {
+      padding: 1vw 2.5vw 0 var(--custom-layout-card-padding);
+      white-space: normal;
+      text-align: center;
+    }
+    .iphone {
+      font-size: 1.5em;
+      color: rgba(255, 255, 255, 0.8);
+    }
+    .time {
+      font-size: var(--sidebar-time-font-size);
+      font-weight: 300;
+      line-height: var(--sidebar-time-line-height);
+      letter-spacing: 0.11vw;
+      margin-left: -0.3vw;
+      color: rgba(255, 255, 255, 0.8);
+      margin: 21px
+    }
+    .date {
+      font-size: var(--sidebar-date-font-size);
+      line-height: var(--sidebar-date-line-height);
+    }
+    hr {
+      margin: 0px -10px 0px -20px
+    }
+    @supports not (-moz-appearance:none) {
+      .time-colon {
+        position: relative;
+        top: -.11em;
+      }
+    }
+    p {
+      font-size: var(--sidebar-font-size);
+      line-height: var(--sidebar-line-height);
+      font-weight: 200;
+      letter-spacing: 0.07vw;
+      color: #b2b7b9;
+      margin-left: -10px;
+    }
+    b {
+      font-weight: 700;
+    }
+    p > b {
+      color: rgba(255, 255, 255, 0.8);
+    }
+    /* portrait */
+    @media screen and (max-width: 1200px) {
+      .time {
+        font-size: calc(var(--sidebar-time-font-size) * 2 );
+        line-height: calc(var(--sidebar-time-line-height) * 2 );
+      }
+      .date {
+        font-size: calc(var(--sidebar-font-size) * 2 );
+        line-height: calc(var(--sidebar-line-height) * 1.4 );
+      }
+      p {
+        font-size: calc(var(--sidebar-font-size) * 1.4 );
+        line-height: calc(var(--sidebar-line-height) * 1.4 );
+      }
+    }
+    /* phone */
+    @media screen and (max-width: 800px) {
+      .time {
+        font-size: calc(var(--sidebar-time-font-size) * 2.6 );
+      }
+      p {
+        font-size: calc(var(--sidebar-font-size) * 2.6 );
+        line-height: calc(var(--sidebar-line-height) * 2.6 );
+        letter-spacing: 0.16vw;
+      }
+      #name {
+        padding: 0 0 0 1vw;
+      }
+    }
+
+sidebar_card:
+  styles:
+    icon:
+      - width: '12%'
+    grid:
+      - grid-template-areas: '"n i"'
+  card_mod:
+    style:
+      .: |
+        #container {
+          margin: 0px 20px;
+        }
+        #container #name {
+          justify-self: start;
+          margin: 0px 18px;
+        }
+        #img-cell {
+          padding-left: 70px;
+        }
+
+sensor:
+  - unique_id: sidebar
+    state: template
+    attributes:
+      time: >
+        {% set hours = now().strftime('%H') %}
+        {% set minutes = now().strftime('%M') %}
+        <span class="time">
+          {{ hours }}<span class="time-colon">:</span>{{ minutes }}
+        </span>
+      date: >
+        <font color='#6a7377'><b>
+        {% if strptime(states('sensor.date'), '%Y-%m-%d').day != None %}
+        {% set days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] %}
+        {% set months = ['January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'] %}
+          {{ days[now().weekday()] }}<br>
+          {{ strptime(states('sensor.date'), '%Y-%m-%d').day }} {{ months[now().month-1] }}
+        {% endif %}
+        </b></font>
+      greet: >
+        <b>
+        {% set time = now().hour %}
+        {% if time <= 1 %} Good Night{{'\U0001F611'}}
+        {% elif time <= 3 %} Good Night{{'\U0001F62A'}}
+        {% elif time <= 5 %} Good Night{{'\U0001F634'}}
+        {% elif time <= 7 %} Good Morning {{'\U0001F4A9'}}
+        {% elif time <= 9 %} Good Morning {{'\u2615\uFE0F'}}
+        {% elif time <= 10 %} Good Morning {{'\U0001F642'}}
+        {% elif time <= 13 %} Good Afternoon {{'\U0001F60A'}}
+        {% elif time <= 15 %} Good Afternoon {{'\U0001F60E'}}
+        {% elif time <= 17 %} Good Afternoon {{'\U0001F44B\U0001F3FB'}}
+        {% elif time <= 19 %} Good Evening {{'\U0001F44B\U0001F3FB'}}
+        {% elif time <= 22 %} Good Evening {{'\U0001F60C'}}
+        {% elif time <= 23 %} Good Evening {{'\U0001F974'}}
+        {% else %} Good Evening {{'\U0001F974'}}
+        {% endif %}
+        </b>
+      active: >
+        <b>
+        {% set lights = [
+          states.light.vardagsrum_tv,
+          states.light.vardagsrum_golv,
+          states.light.vardagsrum_horna,
+          states.light.studio_dator,
+          states.light.badrum_vask_2,
+          states.light.badrum_vask_1,
+          states.light.sovrum_tv,
+          states.light.garderob_lampa,
+          states.light.hall_spot_1,
+          states.light.hall_spot_2,
+          states.light.hall_spot_3,
+          states.light.sovrum_mattias,
+          states.light.sovrum_sanja,
+          states.light.studio_spot_1,
+          states.light.studio_spot_2,
+          states.switch.deltaco_sh_p01_socket
+        ] %}
+
+        {% set devices = [
+          states.switch.imac,
+          states.switch.ps5_635_power,
+          states.switch.gosund_monitors_switch,
+          states.switch.gosund_fan_switch,
+          states.media_player.samsung,
+          states.media_player.sony_bravia_tv,
+          states.climate.ac
+        ] %}
+
+        {% set lights_on = lights | selectattr('state','eq','on') | list %}
+        {% set lights_name = lights | selectattr('state','eq','on') | map(attribute='name') | join(', ') %}
+
+        {% set devices_on = devices | selectattr('state','search','(on|cool|fan_only|playing)') | list %}
+        {% set devices_name = devices_on | map(attribute='name') | join(', ') %}
+
+        {% if (lights_on | length == 0) and (devices_on | length > 0) %}
+          {{ devices_name | regex_replace(',([^,]*)$',' och\\1') }} är på
+
+        {% elif (lights_on | length == 1) and (devices_on | length == 1) %}
+          {{ lights_name }} och {{devices_name }} är på
+
+        {% elif (lights_on | length == 1) and (devices_on | length > 1) %}
+          {{ lights_name }}, {{ devices_name | regex_replace(',([^,]*)$',' och\\1') }} är på
+
+        {% elif (lights_on | length > 1) and (devices_on | length == 1) %}
+          {{ lights_on | length }} lampor och {{ devices_name }} är på
+
+        {% elif (lights_on | length > 1) and (devices_on | length > 1) %}
+          {{ lights_on | length }} lampor, {{ devices_name | regex_replace(',([^,]*)$',' och\\1') }} är på
+
+        {% elif (lights_on | length == 1) and (devices_on | length == 0) %}
+          {{ lights_name }} är på
+
+        {% elif (lights_on | length > 1) and (devices_on | length == 0) %}
+          {{ lights_on | length }} lampor är på
+
+        {% else %}
+          <font color='#6a7377'>Allt är avstängt</font>
+        {% endif %}
+        </b>
+      mailbox: >
+        {% set mailbox = states('sensor.mailbox') %}
+        {% if mailbox | int(default=0) > 0 %}
+          {{ '\U0001F4EC' }} <font color='#6a7377'><b>Brevlåda ({{ mailbox }})</b></font>
+        {% endif %}
+      vacuum: >
+        {% set entity_id = 'vacuum.morty' %}
+        {% if is_state(entity_id, 'cleaning') %}
+          <b>Morty dammsuger</b>
+        {% elif is_state(entity_id, 'returning') %}
+          <b>Morty är färdig</b>
+        {% endif %}
+      weather: >
+        {% set entity = 'weather.smhi_home' %}
+        {% if not is_state(entity, 'unknown') %}
+          {% set temp = state_attr(entity, 'temperature') | round %}
+          {% set precip = state_attr(entity, 'forecast')[0]['precipitation'] | round %}
+            Känns som {{ temp }}° med {{ 'ingen risk för regn' if precip == 0
+            else precip | string + 'mm regn \u2614\uFE0F' }}
+        {% else %}
+          Kan inte läsa in väder...
+        {% endif %}
+      laundry: >
+        {% set start_time = state_attr('calendar.tvatta', 'start_time') %}
+        {% if start_time != None %}
+          {% set time = as_timestamp(start_time) | timestamp_custom('%H:%M') %}
+          {% set hours = as_timestamp(start_time) | timestamp_custom('%H') | int(default=0) / 24 %}
+          {% set count = (as_timestamp(start_time) - as_timestamp(now())) / 86400 - hours %}
+          {% set day = strptime(start_time, '%Y-%m-%d %H:%M:%S').strftime('%A')
+          | replace('Monday', 'Måndag')
+          | replace('Tuesday', 'Tisdag')
+          | replace('Wednesday', 'Onsdag')
+          | replace('Thursday', 'Torsdag')
+          | replace('Friday', 'Fredag')
+          | replace('Saturday', 'Lördag')
+          | replace('Sunday', 'Söndag') %}
+          {% if count <= 0.0 %}
+            {{'\U0001F4A6'}} Tvätt idag {{ time }}
+          {% elif count <= 1.0 %}
+            Tvätt imorgon klockan {{ time }}
+          {% elif count <= 2.0 %}
+            Tvätt i övermorgon klockan {{ time }}
+          {% else %}
+            Tvätt om {{ (count + hours) | round }} dagar på {{ day }} kl {{ time }}
+          {% endif %}
+        {% endif %}
+      battery: >
+        {% set entities = states.sensor 
+          | selectattr('entity_id', 'search', 'battery')
+          | rejectattr('entity_id', 'search', 'iphone')
+          | map(attribute = 'entity_id') | list %}
+        {% for sensor in entities if states(sensor) != 'unknown' and states(sensor) !=
+        'unavailable' and states(sensor) != 'None' and states(sensor) | int(default=0) <= 5 %}
+          {% if loop.first %} {{'\u26A0\uFE0F'}} Batteri {% else %}, {% endif %}
+          {{ state_attr(sensor, 'friendly_name') }} {{ states(sensor) }}%
+        {% endfor %}

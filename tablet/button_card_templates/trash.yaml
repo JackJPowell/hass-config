@@ -1,0 +1,31 @@
+trash:
+  template:
+    - base
+#    - circle
+  state_display: >
+    [[[
+      if (entity) {
+          return entity?.attributes?.recycling_days_until === 1
+              ? 'Recycling'
+              : entity?.attributes?.garbage_days_until === 1
+                ? 'Today'
+                : 'Not Due'
+      }
+      return variables.translate_unknown;
+    ]]]
+  name: >
+    [[[
+      if (entity) {
+          return entity?.attributes?.recycling_days_until === 1
+              ? 'Garbage &'
+              : entity?.attributes?.garbage_days_until === 1
+                ? 'Garbage'
+                : 'Not Due'
+      }
+      return variables.translate_unknown;
+    ]]]
+  tap_action:
+    action: call-service
+    service: input_boolean.turn_off
+    service_data:
+      entity_id: input_boolean.trash_is_due

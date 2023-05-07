@@ -1,0 +1,21 @@
+- id: '1610329609271'
+  name: LightsOnPause
+  entities:
+    light.media_room_main_lights:
+      brightness: 25
+      device_id: '2'
+      zone_id: '1'
+      friendly_name: Media Room_Main Lights
+      supported_features: 33
+      state: 'on'
+  icon: mdi:television-pause
+- id: '1610330680662'
+  name: LightsOffPlay
+  entities:
+    light.media_room_main_lights:
+      device_id: '2'
+      zone_id: '1'
+      friendly_name: Media Room_Main Lights
+      supported_features: 33
+      state: 'off'
+  icon: mdi:television-play

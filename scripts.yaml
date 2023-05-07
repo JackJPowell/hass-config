@@ -1,0 +1,97 @@
+start_roomba:
+  alias: Roomba Start
+  sequence:
+  - service: vacuum.start
+    data:
+      entity_id: vacuum.roomba
+  mode: single
+  icon: mdi:motion-play-outline
+stop_roomba:
+  alias: Roomba Stop
+  sequence:
+  - service: vacuum.stop
+    data:
+      entity_id: vacuum.roomba
+    entity_id: vacuum.roomba
+  mode: single
+  icon: mdi:stop-circle-outline
+roomba_return_home:
+  alias: Roomba Return Home
+  sequence:
+  - service: vacuum.return_to_base
+    data:
+      entity_id: vacuum.roomba
+  mode: single
+  icon: mdi:home-import-outline
+patio_fan_off:
+  sequence:
+  - service: fan.set_percentage
+    data:
+      percentage: 0
+    target:
+      device_id: e364d931ad31036cc319b3252a3cc191
+  mode: single
+  alias: Patio Fan Off
+  icon: hass:fan-off
+patio_fan_high:
+  alias: Patio Fan High
+  sequence:
+  - service: fan.set_percentage
+    data:
+      percentage: 100
+    target:
+      device_id: e364d931ad31036cc319b3252a3cc191
+  mode: single
+  icon: hass:fan
+patio_fan_medium:
+  alias: Patio Fan Medium
+  sequence:
+  - service: fan.set_percentage
+    data:
+      percentage: 66
+    target:
+      device_id: e364d931ad31036cc319b3252a3cc191
+  mode: single
+  icon: hass:fan
+patio_fan_low:
+  alias: Patio Fan Low
+  sequence:
+  - service: fan.set_percentage
+    data:
+      percentage: 33
+    target:
+      device_id: e364d931ad31036cc319b3252a3cc191
+  mode: single
+  icon: hass:fan
+bedtime:
+  alias: Bedtime
+  sequence:
+  - service: light.turn_off
+    data:
+      transition: 15
+    target:
+      entity_id: light.bedtime_lights
+  - service: light.turn_on
+    data: {}
+    target:
+      entity_id: light.bedroom_floor_lamp
+  - if:
+    - condition: state
+      entity_id: cover.garage_door
+      state: open
+    then:
+    - service: notify.mobile_app_iphone_jack
+      data:
+        message: The garage door is open
+        title: Garage Alert
+  - if:
+    - condition: state
+      entity_id: input_boolean.trash_is_due
+      state: 'on'
+    then:
+    - service: notify.mobile_app_iphone_jack
+      data:
+        message: Garbage day is tomorrow
+        title: Garbage Alert
+  mode: single
+  icon: mdi:bed-queen-outline

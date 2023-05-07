@@ -1,0 +1,16 @@
+action: fire-dom-event
+browser_mod:
+  service: browser_mod.popup
+  data:
+    title: Attic Camera
+    card_mod:
+      style:
+        #popup header
+        .:
+    content:
+      show_state: true
+      show_name: true
+      camera_view: auto
+      type: picture-entity
+      entity: camera.camera_attic
+      camera_image: camera.camera_attic

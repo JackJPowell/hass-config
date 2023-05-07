@@ -1,0 +1,11 @@
+alexa:
+  template:
+    - base
+  state_display: >
+    [[[
+      if (entity) {
+          debugger;
+          return state_attr('sensor.next_timer', 'sorted_all')[0][1].alarmTime;
+      }
+      return variables.translate_unknown;
+    ]]]

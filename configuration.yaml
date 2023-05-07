@@ -1,55 +1,69 @@
 homeassistant:
-  customize: !include customize.yaml
   
   auth_providers:
     - type: trusted_networks
       trusted_networks:
         - 192.168.1.0/24
+        - 172.16.0.0/12
     - type: homeassistant
+
+http:
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - 192.168.1.207      # Add the IP address of the proxy server
+    - 172.16.0.0/12
 
 # Configure a default setup of Home Assistant (frontend, api, etc)
 default_config:
 
 # Uncomment this if you are using SSL/TLS, running in Docker container, etc.
-# http:
-#   base_url: example.duckdns.org:8123
+
+
+# Discover some devices automatically
+discovery:
+
+#frontend:
+frontend: !include themes.yaml 
+#template: !include sidebar.yaml
 
 lovelace:
   mode: yaml
-  resources:
+  dashboards:
+    lovelace-tablet:
+      mode: yaml
+      title: Tablet
+      show_in_sidebar: true
+      filename: tablet/lovelace-tablet.yaml
+      icon: mdi:tablet
+    lovelace-rounded:
+      mode: yaml
+      title: Rounded
+      icon: mdi:cellphone
+      show_in_sidebar: true
+      filename: rounded/lovelace-rounded.yaml
+  resources: 
     [
       { url: /hacsfiles/apexcharts-card/apexcharts-card.js,                         type: module },
       { url: /hacsfiles/bar-card/bar-card.js,                                       type: module },
       { url: /hacsfiles/button-card/button-card.js,                                 type: module },
-      { url: /hacsfiles/custom-icons/custom-icons.js,                               type: module },
       { url: /hacsfiles/lovelace-layout-card/layout-card.js,                        type: module },
       { url: /hacsfiles/lovelace-more-info-card/more-info-card.js,                  type: module },
       { url: /hacsfiles/lovelace-mushroom/mushroom.js,                              type: module },
       { url: /hacsfiles/lovelace-slider-entity-row/slider-entity-row.js,            type: module },
-      { url: /hacsfiles/lovelace-xiaomi-vacuum-map-card/xiaomi-vacuum-map-card.js,  type: module },
+      { url: /hacsfiles/kiosk-mode/kiosk-mode.js,                                   type: module },
       { url: /hacsfiles/swipe-card/swipe-card.js,                                   type: module },
       { url: /hacsfiles/tabbed-card/tabbed-card.js,                                 type: module },
-
+      { url: /hacsfiles/spotify-card/spotify-card.js,                               type: module },
+      { url: /hacsfiles/mini-media-player/mini-media-player-bundle.js,              type: module },
+      { url: /hacsfiles/my-cards/my-cards.js,                                       type: module },
+      { url: /hacsfiles/upcoming-media-card/upcoming-media-card.js?v=0.4.3,         type: js     },
       { url: '/local/marked.min.js?v=4.2.1',                                        type: module },
       { url: '/local/vanilla-tilt.min.js?v=1.7.3',                                  type: module },
-      { url: '/local/browser_mod_icon.js?v=0.5',                                    type: module },
       { url: '/local/fonts.css?v=2.1',                                              type: css }
     ]
 
-recorder:
-  db_url: !secret recorder_db_url
-  exclude:
-    entity_globs:
-      - sensor.browser_*
-
-logger:
-  default: warning
-  logs:
-    homeassistant.components.websocket_api: fatal
-    custom_components.monitor_docker.helpers: error
-    homeassistant.setup: error
-
-sensor:
+# Sensors
+sensor: 
   # Weather prediction
   #- platform: yr
   - platform: sonos_upcoming_media
@@ -57,35 +71,29 @@ sensor:
     max: 2
   - platform: sonarr_upcoming_media
     api_key: f5ec1dd7cb68466d8ffac2b98eb2f432
-    host: 192.168.1.132
-    port: 8989
+    host: 192.168.1.207
+    port: 8787
     days: 7
     ssl: false
     max: 10
+  #Try to get token from 127.0.0.1 on falcon
+  - platform: plex_recently_added
+    name: plex_recently_added
+    token: d1o9w1ZKb2Tip2hPuD8c
+    host: 192.168.1.207
+    image_resolution: 800
+    exclude_keywords:
+      - Letterkenny
+
   - platform: waste_connections
     urlbase: https://api.recollect.net/api/places/E986C39C-C5CD-11EA-8DA2-6CE17286E7FE/services/903/events
-  - platform: command_line
-    unique_id: 1644163974631
-    name: ps5_sensor
-    command: 'python ./custom_sensors/ps5.py -q 192.168.1.203'
-    scan_interval: 30
-  - platform: template
-    sensors:
-      timer_alexa:
-        friendly_name: "Alexa Timer"
-        value_template: >
-          {% if states('sensor.jack_s_fire_next_timer')  != 'unavailable' %}
-            {{ ((as_timestamp(states('sensor.jack_s_fire_next_timer')) - as_timestamp(now()))) | int + 1 }}
-          {% else %}
-              0
-          {% endif %}
-        unit_of_measurement: Seconds
-        icon_template: hass:timer 
+
   # Minimal configuration of the standard time and date sensor
   - platform: time_date
     display_options:
       - 'date_time_iso'
   # Build on the standard sensor to produce one that can be customized
+
 template:
   - sensor:
       - name: "Date and time"
@@ -119,7 +127,7 @@ template:
             {{ hours }}<span class="time-colon">:</span>{{ minutes }}
           </span>
         datum: >
-          <span class="date">
+          <span class="date"> 
             {{ states('sensor.date') }}
           </span>
           <hr /> 
@@ -143,15 +151,13 @@ template:
           </b>
           <hr />
           
-# Text to speech
-tts:
+# Text to speech 
+tts: 
   - platform: google_translate
 
-group: !include groups.yaml
 automation: !include automations.yaml
 script: !include scripts.yaml
 scene: !include scenes.yaml
-alert: !include alert.yaml
 
 # Example configuration.yaml entry
 lutron_caseta:
@@ -160,27 +166,16 @@ lutron_caseta:
     certfile: config/lutron_caseta/caseta.crt
     ca_certs: config/lutron_caseta/caseta-bridge.crt
 
+spotcast: 
+  sp_dc: !secret spotify_sp_dc
+  sp_key: !secret spotify_sp_key
+
 binary_sensor:
   - platform: template
     sensors:
       garage_open:
         value_template: '{{ is_state("cover.garage_door", "open") and state_attr("sun.sun", "elevation") < 4 }}'
         friendly_name: 'Garage is open at night'
-
-switch:
-  - platform: command_line
-    switches:
-      playstation:
-        value_template: >
-          {% if value == 'ON' %}
-            Playing
-          {% elif value == 'STANDBY' %}
-            Standby
-          {% else %}
-            Off
-          {% endif %}
-        command_state: 'python ./custom_sensors/ps5.py -q 192.168.1.203'
-        command_on: 'python ./custom_sensors/ps5.py -w -u -1928588545 192.168.1.203'
 
 monitor_docker:
   - name: Docker
@@ -189,7 +184,7 @@ monitor_docker:
     containers:
       - Sonarr
       - zwavejs
-      - Unifi-New
+      - Unifi
       - Transmission
       - HomeAssistant
     rename: 
@@ -207,5 +202,24 @@ monitor_docker:
       - memory_percentage
       - 1cpu_percentage
 
-lovelace:
-  mode: storage
+# - platform: command_line
+#   unique_id: 1644163974631
+#   name: ps5_sensor
+#   command: 'python ./custom_sensors/ps5.py -q 192.168.1.203'
+#   scan_interval: 30
+
+#switch:
+#  - platform: command_line
+#    switches:
+#      playstation:
+#        value_template: >
+#          {% if value == 'ON' %}
+#            Playing
+#          {% elif value == 'STANDBY' %}
+#            Standby
+#          {% else %}
+#            Off
+#          {% endif %}
+#        command_state: 'python ./custom_sensors/ps5.py -q 192.168.1.203'
+#        command_on: 'python ./custom_sensors/ps5.py -w -u -1928588545 192.168.1.203'
+

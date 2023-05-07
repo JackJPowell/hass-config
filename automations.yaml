@@ -1,0 +1,587 @@
+- id: '1610330865538'
+  alias: Lights On Pause
+  description: Turn on Media Room Lights to 10% brightness when pause is pressed
+  trigger:
+  - platform: webhook
+    webhook_id: Command:MediaRoomLightsOnPause
+    allowed_methods:
+    - POST
+    - PUT
+    local_only: true
+  condition: []
+  action:
+  - type: turn_on
+    device_id: e894c3d2a4fd16887489ec243b379676
+    entity_id: light.media_room_main_lights
+    domain: light
+    brightness_pct: 10
+  mode: single
+- id: '1610330907288'
+  alias: Lights Off Play
+  description: Turn off Media Room Lights when Play is pressed
+  trigger:
+  - platform: webhook
+    webhook_id: Command:MediaRoomLightsOff
+    allowed_methods:
+    - POST
+    - PUT
+    local_only: true
+  condition: []
+  action:
+  - type: turn_off
+    device_id: e894c3d2a4fd16887489ec243b379676
+    entity_id: light.media_room_main_lights
+    domain: light
+  mode: single
+- id: '1610732579855'
+  alias: Start Roomba when Away
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: input_boolean.chicadeehome
+    to: 'off'
+  condition:
+  - condition: time
+    weekday:
+    - mon
+    - tue
+    - wed
+    - thu
+    - fri
+    - sat
+    - sun
+    after: 08:00:00
+    before: '21:00:00'
+  action:
+  - service: vacuum.start
+    target:
+      entity_id: vacuum.roomba
+  mode: single
+- id: '1613325102616'
+  alias: Set Home
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - device_tracker.iphone_jack
+    to: home
+  - platform: state
+    entity_id:
+    - device_tracker.iphone_jacqueline
+    to: home
+  condition: []
+  action:
+  - service: input_boolean.turn_on
+    data: {}
+    entity_id: input_boolean.chicadeehome
+  mode: single
+- id: '1613325218593'
+  alias: Set Away
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - device_tracker.iphone_jack
+    to: not_home
+  - platform: state
+    entity_id:
+    - device_tracker.iphone_jacqueline
+    to: not_home
+  condition:
+  - condition: state
+    entity_id: device_tracker.iphone_jack
+    state: not_home
+  - condition: state
+    entity_id: device_tracker.iphone_jacqueline
+    state: not_home
+  action:
+  - service: input_boolean.turn_off
+    data: {}
+    entity_id: input_boolean.chicadeehome
+  mode: single
+- id: '1613329611577'
+  alias: Notify when home is empty
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: input_boolean.chicadeehome
+    to: 'off'
+  condition: []
+  action:
+  - device_id: 6ac6d5c742752b6d74281033da7f835e
+    domain: mobile_app
+    type: notify
+    message: Chicadee Empty
+    title: Home Status
+  mode: single
+- id: '1624132529486'
+  alias: Toggle Porch Lights
+  description: ''
+  trigger: []
+  condition: []
+  action:
+  - type: toggle
+    device_id: e548f18f084131af3bf4d2cf5d1a06bf
+    entity_id: switch.lights
+    domain: switch
+  mode: single
+- id: '1624138424662'
+  alias: Porch On
+  description: Turns on all devices on the back porch
+  trigger: []
+  condition: []
+  action:
+  - service: media_player.media_play
+    target:
+      device_id: 195032c16733c657564d73f66c493be5
+  - service: fan.set_percentage
+    data:
+      percentage: 100
+    target:
+      device_id: e364d931ad31036cc319b3252a3cc191
+  - type: turn_on
+    device_id: e548f18f084131af3bf4d2cf5d1a06bf
+    entity_id: switch.lights
+    domain: switch
+  mode: single
+- id: '1624138663399'
+  alias: Porch Off
+  description: Turns off all devices on the back porch
+  trigger: []
+  condition: []
+  action:
+  - service: media_player.media_pause
+    target:
+      device_id: 195032c16733c657564d73f66c493be5
+  - service: fan.set_percentage
+    data:
+      percentage: 0
+    target:
+      device_id: e364d931ad31036cc319b3252a3cc191
+  - type: turn_off
+    device_id: e548f18f084131af3bf4d2cf5d1a06bf
+    entity_id: switch.lights
+    domain: switch
+  mode: single
+- id: '1624204646385'
+  alias: Play Sonos Roam
+  description: ''
+  trigger: []
+  condition: []
+  action:
+  - service: media_player.media_play
+    target:
+      device_id: 195032c16733c657564d73f66c493be5
+  mode: single
+- id: '1630338540397'
+  alias: Start Timer
+  description: Alexa Timer
+  trigger:
+  - platform: state
+    entity_id: sensor.next_timer
+    attribute: status
+    to: 'ON'
+  condition: []
+  action:
+  - service: timer.start
+    data:
+      duration: '{{((as_timestamp(states(''sensor.next_timer'')) - as_timestamp(now())))
+        | int }}'
+    target:
+      entity_id: timer.alexa
+  mode: single
+- id: '1630357305169'
+  alias: End Timer
+  description: Alexa Timer (Cancel)
+  trigger:
+  - platform: state
+    entity_id: sensor.next_timer
+    attribute: status
+    to: 'OFF'
+  condition: []
+  action:
+  - service: timer.cancel
+    target:
+      entity_id: timer.alexa
+  mode: single
+- id: '1659900952399'
+  alias: Notify when garage is open at night
+  description: ''
+  trigger:
+  - platform: sun
+    event: sunset
+    offset: -01:00:00
+  condition:
+  - condition: device
+    device_id: 6749e608d4ea0770f088dbe437547d94
+    domain: cover
+    entity_id: cover.garage_door
+    type: is_open
+  action:
+  - service: notify.mobile_app_iphone_jack
+    data:
+      message: The Garage appears to open at night!
+      title: Home Assistant Warning
+  - service: notify.mobile_app_iphone_jacqueline
+    data:
+      message: The Garage appears to open at night!
+      title: Home Assistant Warning
+  mode: single
+- id: '1664148446202'
+  alias: Turn on String Lights with Sconces
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - light.patio_sconces
+    from: 'off'
+    to: 'on'
+  condition: []
+  action:
+  - service: switch.turn_on
+    data: {}
+    target:
+      entity_id: switch.lights
+  - if:
+    - condition: sun
+      after: sunset
+    then:
+    - service: light.turn_on
+      data: {}
+      target:
+        entity_id: light.flood
+  mode: single
+- id: '1664148783592'
+  alias: Turn off string lights with sconces
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - light.patio_sconces
+    from: 'on'
+    to: 'off'
+    id: '1'
+  condition: []
+  action:
+  - service: switch.turn_off
+    data: {}
+    target:
+      entity_id: switch.lights
+  - if:
+    - condition: sun
+      after: sunset
+    then:
+    - service: light.turn_off
+      data: {}
+      target:
+        entity_id: light.flood
+  mode: single
+- id: '1664150457171'
+  alias: Scene Controller
+  description: ''
+  use_blueprint:
+    path: fxlt/zen32-scene-controller-z-wave-js.yaml
+    input:
+      zooz_switch: db7a26169916812cf76f8a5ad6f2ee70
+      scene_5:
+      - service: light.toggle
+        data: {}
+        target:
+          entity_id: light.flood
+      scene_1:
+      - service: script.patio_fan_low
+        data: {}
+      scene_3:
+      - service: script.patio_fan_high
+        data: {}
+      scene_4:
+      - service: script.patio_fan_off
+        data: {}
+      scene_2:
+      - service: script.patio_fan_medium
+        data: {}
+      scene_52:
+      - service: light.turn_off
+        data: {}
+        target:
+          entity_id: light.flood
+- id: '1664239515802'
+  alias: Toggle Lamp posts on garage door
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - cover.garage_door
+    to: open
+    from: closed
+  condition:
+  - condition: sun
+    after: sunset
+    after_offset: -00:30:00
+  action:
+  - service: light.toggle
+    data: {}
+    target:
+      entity_id: light.lamp_posts
+  mode: single
+- id: '1672158991098'
+  alias: Trash is Due
+  description: Turn on input boolean when trash is due
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.waste_connections_pickups
+    attribute: garbage_days_until
+    to: '1'
+    enabled: false
+  - platform: state
+    entity_id:
+    - sensor.waste_connections_pickups
+    to: '1'
+  condition: []
+  action:
+  - service: input_boolean.turn_on
+    data: {}
+    target:
+      entity_id: input_boolean.trash_is_due
+  mode: single
+- id: '1672547004571'
+  alias: Start Meater Timer
+  description: Start timer for Meater remaining time
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.meater_probe_remaining_time
+  condition: []
+  action:
+  - service: timer.start
+    data:
+      duration: '{{((as_timestamp(states(''sensor.meater_probe_remaining_time''))
+        - as_timestamp(now()))) | int }}'
+    target:
+      entity_id: timer.meater
+  mode: single
+- id: '1673212565563'
+  alias: Morning Annoucement
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - switch.fire_tablet_screen
+    to: 'on'
+  condition:
+  - condition: time
+    before: 07:00:00
+    after: 06:00:00
+    weekday:
+    - mon
+    - tue
+    - wed
+    - thu
+    enabled: false
+  - condition: state
+    entity_id: input_boolean.announcement_compete
+    state: 'off'
+  action:
+  - service: media_player.volume_set
+    data:
+      volume_level: 0.3
+    target:
+      entity_id: media_player.fire_tablet
+  - service: tts.google_translate_say
+    data:
+      entity_id: media_player.fire_tablet
+      message: "{% if states('sensor.morning_commute')|int < 32 %}\n  {% set travel_desc
+        = 'nominal with an estimated travel time of ' + states('sensor.morning_commute')|string
+        + ' minutes' %}\n{% else %}\n  {% set travel_desc = 'poor with an estimated
+        travel time of ' + states('sensor.morning_commute')|string + ' minutes.' +
+        ' Check Google maps before leaving.' %}\n{% endif %}\nGood morning Jacqueline,
+        It is {{ states('weather.home') }} outside and the temperature is currently
+        {{ state_attr('weather.home', 'temperature') }} degrees. {% if states.weather.home.attributes.forecast[0].precipitation_probability
+        > 0 %} The high today is {{ states.weather.home.attributes.forecast[0].temperature
+        }} degrees. with a chance of rain at {{ states.weather.home.attributes.forecast[0].precipitation_probability
+        }} percent. {% else %} The high today is {{ states.weather.home.attributes.forecast[0].temperature
+        }} degrees. {% endif %} Traffic on your way to work is {{ travel_desc }}\n"
+  - service: input_boolean.turn_on
+    data: {}
+    target:
+      entity_id: input_boolean.announcement_compete
+  mode: single
+- id: '1673214016017'
+  alias: Turn off Announcement Flag
+  description: Turn off announcement flag
+  trigger:
+  - platform: time
+    at: 00:00:00
+  condition: []
+  action:
+  - service: input_boolean.turn_off
+    data: {}
+    target:
+      entity_id: input_boolean.announcement_compete
+  mode: single
+- id: update_morning_commute_sensor
+  alias: Commute - Update morning commute sensor
+  description: ''
+  trigger:
+  - platform: time_pattern
+    minutes: /5
+  condition:
+  - condition: time
+    after: 05:00:00
+    before: 08:00:00
+    weekday:
+    - tue
+    - wed
+    - thu
+  action:
+  - service: homeassistant.update_entity
+    target:
+      entity_id: sensor.morning_commute
+    data: {}
+  initial_state: 'on'
+- id: '1674524667106'
+  alias: Commute - Update evening commute sensor
+  description: ''
+  trigger:
+  - platform: time_pattern
+    minutes: /5
+  condition:
+  - condition: time
+    after: '17:50:00'
+    before: '18:05:00'
+    weekday:
+    - tue
+    - wed
+    - thu
+  action:
+  - service: homeassistant.update_entity
+    target:
+      entity_id: sensor.evening_commute
+    data: {}
+  initial_state: 'on'
+- id: '1674526911981'
+  alias: Notify - Evening Commute
+  description: ''
+  trigger:
+  - platform: time
+    at: '17:55:00'
+  condition:
+  - condition: time
+    before: '23:59:59'
+    weekday:
+    - tue
+    - wed
+    - thu
+    after: 00:00:00
+  - condition: state
+    entity_id: person.jacqueline
+    state: not_home
+  action:
+  - service: notify.mobile_app_iphone_jacqueline
+    data:
+      message: 'Estimated Travel Time: {{ states(''sensor.evening_commute'')|string
+        + '' minutes'' }} '
+      data:
+        actions:
+        - action: URI
+          title: Open Google Maps
+          uri: comgooglemaps://?saddr=602+Scarboro+Road,+37830&daddr=1848+chicadee+dr,+37919&directionsmode=driving
+  mode: single
+- id: '1675645559855'
+  alias: Navigate to Timers
+  description: Navigate to Timers screen on Kiosk
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.next_timer
+    id: 'On'
+    from: unknown
+  - platform: state
+    entity_id:
+    - sensor.next_timer
+    to: unknown
+    id: 'Off'
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: 'Off'
+      sequence:
+      - service: browser_mod.navigate
+        data:
+          path: /lovelace-tablet/home?hide_header
+        target:
+          device_id: 955c5434529ba257015c8a35fd476b21
+    - conditions:
+      - condition: trigger
+        id: 'On'
+      sequence:
+      - service: browser_mod.navigate
+        data:
+          path: /lovelace-tablet/timers?hide_header
+        target:
+          device_id: 955c5434529ba257015c8a35fd476b21
+  mode: single
+- id: '1675735933854'
+  alias: 'Timer: Second Timer'
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.next_timer
+    attribute: sorted_active
+  condition: []
+  action:
+  - service: timer.start
+    data:
+      duration: '{% set json = state_attr(''sensor.next_timer'', ''sorted_active'')
+        | from_json %}   {{ (( json[1][1].createdDate / 1000 | int ) + ( json[0][1].originalDurationInMillis
+        / 1000 )  - as_timestamp(now())) | int  }}'
+    target:
+      entity_id: timer.alexa2
+  mode: single
+- id: '1675818492002'
+  alias: Test Timers
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.next_timer
+    attribute: sorted_active
+  condition: []
+  action:
+  - variables:
+      count: '{{ state_attr(''sensor.next_timer'', ''sorted_active'') | from_json
+        | list | length }}'
+  - repeat:
+      while: '{{ repeat.index <= state_attr(''sensor.next_timer'', ''sorted_active'')
+        | from_json | list | length }}'
+      sequence:
+      - service: timer.start
+        data:
+          duration: '{% set json = state_attr(''sensor.next_timer'', ''sorted_active'')
+            | from_json %}   {{ (( json[count - repeat.index][1].createdDate / 1000
+            | int ) + ( json[count - repeat.index][1].originalDurationInMillis / 1000
+            )  - as_timestamp(now())) | int  }}'
+        target:
+          entity_id: timer.alexa{{ repeat.index | string }}
+  mode: single
+- id: '1677426254188'
+  alias: 'Sunset: Turn on Flood Lights'
+  description: ''
+  trigger:
+  - platform: sun
+    event: sunset
+    offset: 0
+  condition:
+  - condition: state
+    entity_id: light.patio_sconces
+    state: 'on'
+  action:
+  - service: light.turn_on
+    data: {}
+    target:
+      entity_id: light.flood
+  mode: single

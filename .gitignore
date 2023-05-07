@@ -4,6 +4,8 @@
 backups
 blueprints
 deps
+ui_lovelace_minimalist
+
 
 secrets_template.yaml
 secrets.yaml
@@ -12,6 +14,13 @@ custom_components/
 www/community/
 www/fonts/
 www/Plex_Recently_Added/
+config/
+custom_sensors/
+image/
+themes/
+tts/
 
 *.code-workspace
 home-assistant.log*
+home-assistant_v2*
+harmony*.conf

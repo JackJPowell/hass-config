@@ -1,0 +1,669 @@
+button_card_templates:
+  !include_dir_merge_named button_card_templates
+
+views:
+  - title: Home
+    cards:
+      - type: custom:button-card
+        name: Home 
+        styles:  
+          card:
+            - background: none
+            - padding: 0px 0px 16px 0px
+            - '--mdc-ripple-press-opacity': 0
+          name:  
+            - font-size: 32px
+            - color: var(--contrast20)  
+      - type: conditional 
+        conditions:
+          - entity: media_player.living_room_speaker
+            state_not: playing
+
+          - entity: media_player.sonos_roam
+            state_not: playing
+
+          - entity: media_player.plex_on_android_tv
+            state_not: playing
+
+          - entity: media_player.plex_on_apple_tv
+            state_not: playing
+
+          - entity: sensor.ps5_activity
+            state_not: playing
+        card:
+          type: custom:button-card
+          entity: sensor.plex_recently_added
+          template:
+            - base
+            - base_media
+            - conditional_media 
+
+      - type: conditional
+        conditions:
+          - entity: media_player.living_room_speaker
+            state: playing
+        card:
+          type: custom:button-card
+          entity: media_player.living_room_speaker
+          template:
+            - conditional_media
+
+      - type: conditional
+        conditions:
+          - entity: sensor.ps5_activity
+            state: playing
+        card:
+          type: custom:button-card
+          entity: sensor.ps5_activity
+          template:
+            - conditional_media
+
+      - type: conditional
+        conditions:
+          - entity: media_player.sonos_roam
+            state: playing
+        card:
+          type: custom:button-card
+          entity: media_player.sonos_roam
+          template:
+            - conditional_media
+
+      - type: conditional
+        conditions:
+          - entity: media_player.plex_on_android_tv
+            state: playing
+        card:
+          type: custom:button-card
+          entity: media_player.plex_on_android_tv
+          template:
+            - conditional_media
+
+      - type: conditional
+        conditions:
+          - entity: media_player.plex_on_apple_tv
+            state: playing
+        card:
+          type: custom:button-card
+          entity: media_player.plex_on_apple_tv
+          template:
+            - conditional_media
+          
+      - type: grid
+        columns: 4
+        cards:
+          - type: custom:button-card
+            icon: mdi:plex
+            entity: switch.harmony_watch_plex
+            show_name: false
+            confirmation:
+              text: '[[[ return `Are you sure you want to watch Plex?` ]]]'
+            aspect_ratio: 1/1
+            tap_action:  
+              action: call-service
+              service: switch.toggle 
+              haptic: medium
+              service_data:
+                entity_id: switch.harmony_watch_plex
+            styles:
+              card:
+                - border-radius: 24px
+                - background-color: var(--contrast2)
+              icon:
+                - color: var(--contrast20)
+            state:
+              - value: 'on'
+                styles:
+                  icon: 
+                    - color: var(--contrast1)
+                  card:
+                    - background-color: var(--orange)
+          - type: custom:button-card
+            icon: mdi:garage
+            aspect_ratio: 1/1
+            entity: cover.garage_door
+            show_name: false
+            tap_action:
+              action: call-service
+              service: cover.toggle
+              haptic: medium
+              service_data:
+                entity_id: cover.garage_door
+            styles:
+              card:
+                - border-radius: 24px
+                - background-color: var(--contrast2)
+              icon:
+                - color: var(--contrast20)
+            state:
+              - value: 'open'
+                styles:
+                  icon:
+                    - color: var(--contrast20)
+                  card:
+                    - background-color: var(--red)
+          - type: custom:button-card
+            icon: mdi:bed-queen-outline
+            aspect_ratio: 1/1
+            tap_action:
+              action: call-service
+              service: script.bedtime
+              haptic: medium
+            styles:
+              card:
+                - border-radius: 24px
+                - background-color: var(--contrast2)
+              icon:
+                - color: var(--contrast20)
+
+          - type: conditional
+            conditions:
+              - entity: sensor.meater_probe_cook_state 
+                state_not:
+                  - Started
+                  - Configured
+
+              - entity: input_boolean.trash_is_due
+                state_not: "on"
+            card:
+              type: custom:button-card
+              icon: mdi:check-all
+              aspect_ratio: 1/1
+              styles:
+                card:
+                  - border-radius: 24px
+                  - background-color: var(--contrast2)
+                icon:
+                  - color: var(--contrast20)
+
+          - type: conditional   
+            conditions:
+              - entity: input_boolean.trash_is_due
+                state: "on"
+            card:
+              entity: sensor.waste_connections_pickups  
+              type: custom:button-card
+              show_name: false
+              icon: mdi:trash-can-outline
+              aspect_ratio: 1/1
+              tap_action:
+                action: call-service
+                service: input_boolean.turn_off
+                haptic: medium
+                service_data:
+                  entity_id: input_boolean.trash_is_due
+              styles:
+                card:
+                  - border-radius: 24px
+                  - background-color: var(--green)
+                icon:
+                  - color: var(--black)
+
+          - type: conditional
+            conditions:
+              - entity: sensor.meater_probe_cook_state 
+                state: 
+                  - Started
+                  - Configured 
+            card:   
+              type: custom:button-card 
+              entity: timer.meater  
+              show_name: false
+              icon: mdi:thermometer-probe
+              aspect_ratio: 1/1
+              styles:
+                card:
+                  - border-radius: 24px
+                  - background-color: var(--green)
+                icon:
+                  - color: var(--black)
+
+      - type: grid
+        columns: 2
+        cards:
+          - type: custom:button-card
+            name: Media Room
+            icon: mdi:track-light
+            entity: light.media_room_main_lights
+            template: 
+              - light
+            variables:
+              var_entity: light.media_room_main_lights
+          - type: custom:button-card
+            name: Entry Way
+            icon: mdi:track-light
+            entity: light.entry_way
+            template:
+              - light
+            variables: 
+              var_entity: light.entry_way 
+            
+  - title: Patio
+    cards:
+      - type: custom:button-card
+        name: Patio
+        custom_fields:  
+          badge:
+            card:
+              type: custom:button-card
+              name: '[[[return states["media_player.sonos_roam"].state]]]'
+              label: '[[[return states["sensor.sonos_roam_battery"].state + "%"]]]'
+              show_label: true
+              show_icon: false
+              entity: media_player.sonos_roam
+              tap_action:
+                action: more-info
+                haptic: medium
+              styles:
+                grid:
+                  - grid-template-areas: '"n gutter l"'
+                  - grid-template-columns: min-content 5px min-content
+                  - grid-template-rows: min-content
+                card:
+                  - padding: 6px 10px
+                  - font-size: 12px
+                  - line-height: 18px
+                  - font-weight: 500
+                  - background: var(--contrast20)
+                name:
+                  - color: var(--contrast1)
+                label:
+                  - color: var(--contrast12)
+        styles:
+          grid:
+            - grid-template-areas: '"n" "badge"'
+          card:
+            - background: none
+            - padding: 0px 0px 16px 0px
+            - '--mdc-ripple-press-opacity': 0
+          name:
+            - font-size: 32px
+            - color: var(--contrast20)
+          custom_fields:
+            badge:
+              - margin: 16px auto 0 auto
+              - '--mdc-ripple-press-opacity': 0.5
+      - type: custom:button-card
+        entity: media_player.sonos_roam
+        show_entity_picture: true
+        show_name: false
+        tap_action:
+          action: more-info
+        styles:
+          grid:
+            - grid-template-areas: '"info"'
+            - grid-template-columns: 1fr
+            - grid-template-rows: min-content
+          card:
+            - background: none
+            - padding: 0
+            - position: relative
+            - '--mdc-ripple-press-opacity': 0
+          img_cell:
+            - position: absolute
+          icon:
+            - width: 150%
+            - opacity: var(--color-tint)
+            - '-webkit-filter': blur(20px)
+            - '-moz-filter': blur(20px)
+            - '-o-filter': blur(20px)
+            - '-ms-filter': blur(20px)
+            - filter: blur(20px)
+        custom_fields:
+          info:
+            card:
+              type: custom:button-card
+              entity: media_player.sonos_roam
+              show_entity_picture: true
+              name: |
+                [[[
+                  if (states['media_player.sonos_roam'].attributes.media_title)
+                    return states['media_player.sonos_roam'].attributes.media_title;
+                  else
+                    return "Nothing is playing";
+                ]]]
+              label: |
+                [[[
+                  if (states['media_player.sonos_roam'].attributes.media_artist)
+                    return states['media_player.sonos_roam'].attributes.media_artist;
+                  else
+                    return "";
+                ]]]
+              show_label: true
+              show_icon: true
+              styles:
+                grid:
+                  - grid-template-areas: '"i gutter n" "i gutter l"'
+                  - grid-template-columns: min-content 24px 1fr
+                  - grid-template-rows: min-content
+                card:
+                  - background: none
+                  - border-radius: 0
+                  - background: none
+                  - padding: 24px
+                  - '--mdc-ripple-press-opacity': 0
+                img_cell:
+                  - height: 80px
+                  - width: 80px
+                  - border-radius: 16px
+                icon:
+                  - height: 100%
+                  - width: 100%
+                name:
+                  - font-size: 16px
+                  - color: var(--contrast20)
+                  - width: 100%
+                  - text-align: left
+                  - align-self: end
+                label:
+                  - font-size: 12px
+                  - color: var(--contrast20)
+                  - opacity: 0.5
+                  - width: 100%
+                  - text-align: left
+                  - align-self: start  
+                custom_fields:
+                  image:
+                    - '--mdc-ripple-press-opacity': 0.5
+      - type: grid
+        columns: 2
+        cards:
+          - type: custom:button-card
+            name: Lights
+            icon: mdi:track-light
+            entity: light.patio_sconces
+            template:
+              - light
+            variables: 
+              var_entity: light.patio_sconces
+          - type: custom:button-card
+            entity: fan.ceiling_fan
+            tap_action:
+              action: call-service
+              service: script.patio_fan_high
+              data: {}
+              target: {}
+            name: Fans
+            double_tap_action:
+              !include popup/patio_fans.yaml
+            template:
+              - light
+  - title: Media
+    cards:
+      - type: custom:button-card 
+        name: Media 
+        styles:
+          card:  
+            - background: none
+            - padding: 0px 0px 16px 0px
+            - '--mdc-ripple-press-opacity': 0
+          name:  
+            - font-size: 32px
+            - color: var(--contrast20) 
+      - type: conditional
+        conditions:
+          - entity: media_player.plex_on_android_tv
+            state_not: playing
+
+          - entity: sensor.ps5_activity
+            state_not: playing
+        card:
+          type: custom:button-card
+          entity: sensor.plex_recently_added
+          template:
+            - base
+            - base_media
+            - conditional_media 
+
+      - type: conditional
+        conditions:
+          - entity: sensor.ps5_activity
+            state: playing
+        card:
+          type: custom:button-card
+          entity: sensor.ps5_activity
+          template:
+            - conditional_media
+
+      - type: conditional
+        conditions:
+          - entity: media_player.plex_on_android_tv
+            state: playing
+        card:
+          type: custom:button-card
+          entity: media_player.plex_on_android_tv
+          template:
+            - conditional_media
+
+      - type: grid
+        columns: 3
+        cards:
+          - type: custom:button-card
+            icon: mdi:home-variant
+            aspect_ratio: 1/1
+            entity: media_player.nvidia_shield
+            show_name: false
+            tap_action:
+              action: call-service
+              haptic: medium
+              service: remote.send_command
+              service_data:
+                command: Home
+                device: Shield TV Pro
+                entity_id: remote.harmony
+            styles:
+              card:
+                - border-radius: 24px
+                - background-color: var(--red)
+              icon:
+                - width: 32px
+                - color: var(--contrast20)
+
+          - type: custom:button-card
+            icon: mdi:chevron-up
+            aspect_ratio: 1/1
+            entity: media_player.nvidia_shield
+            show_name: false
+            tap_action:
+              action: call-service
+              haptic: medium
+              service: remote.send_command
+              service_data:
+                command: DirectionUp
+                device: Shield TV Pro
+                entity_id: remote.harmony
+            styles:
+              card:
+                - border-radius: 24px
+                - background-color: var(--contrast2)
+              icon:
+                - width: 32px
+                - color: var(--contrast8)
+
+          - type: custom:button-card
+            icon: mdi:backburger
+            aspect_ratio: 1/1
+            entity: media_player.nvidia_shield
+            show_name: false
+            tap_action:
+              action: call-service
+              haptic: medium
+              service: remote.send_command
+              service_data:
+                command: Back
+                device: Shield TV Pro
+                entity_id: remote.harmony
+            styles:
+              card:
+                - border-radius: 24px
+                - background-color: var(--red)
+              icon:
+                - width: 32px
+                - color: var(--contrast20)
+            state:
+              - value: 'on'
+                styles:
+                  icon:
+                    - color: var(--contrast20)
+
+          - type: custom:button-card
+            icon: mdi:chevron-left
+            aspect_ratio: 1/1
+            entity: media_player.nvidia_shield
+            show_name: false
+            tap_action:
+              action: call-service
+              haptic: medium
+              service: remote.send_command
+              service_data:
+                command: DirectionLeft
+                device: Shield TV Pro
+                entity_id: remote.harmony
+            styles:
+              card:
+                - border-radius: 24px
+                - background-color: var(--contrast2)
+              icon:
+                - width: 32px
+                - color: var(--contrast8)
+
+          - type: custom:button-card
+            icon: mdi:circle-outline
+            aspect_ratio: 1/1
+            entity: media_player.nvidia_shield
+            show_name: false
+            tap_action:
+              action: call-service
+              haptic: medium
+              service: remote.send_command
+              service_data:
+                command: Select
+                device: Shield TV Pro
+                entity_id: remote.harmony
+            styles:
+              card:
+                - border-radius: 24px
+                - background-color: var(--contrast2)
+              icon:
+                - width: 32px
+                - color: var(--contrast8)
+
+          - type: custom:button-card
+            icon: mdi:chevron-right
+            aspect_ratio: 1/1
+            entity: media_player.nvidia_shield
+            show_name: false
+            tap_action:
+              action: call-service
+              haptic: medium
+              service: remote.send_command
+              service_data:
+                command: DirectionRight
+                device: Shield TV Pro
+                entity_id: remote.harmony
+            styles:
+              card:
+                - border-radius: 24px
+                - background-color: var(--contrast2)
+              icon:
+                - width: 32px
+                - color: var(--contrast8)
+
+          - type: custom:button-card
+            icon: mdi:volume-minus
+            aspect_ratio: 1/1
+            entity: media_player.nvidia_shield
+            show_name: false
+            tap_action:
+              action: call-service
+              haptic: medium
+              service: remote.send_command
+              service_data:
+                command: VolumeDown
+                device: Denon X4200
+                entity_id: remote.harmony
+            styles:
+              card:
+                - border-radius: 24px
+                - background-color: var(--contrast2)
+              icon:
+                - width: 32px
+                - color: var(--contrast8)
+
+          - type: custom:button-card
+            icon: mdi:chevron-down
+            aspect_ratio: 1/1
+            entity: media_player.nvidia_shield
+            show_name: false
+            tap_action:
+              action: call-service
+              haptic: medium
+              service: remote.send_command
+              service_data:
+                command: Directiondown
+                device: Shield TV Pro
+                entity_id: remote.harmony
+            styles:
+              card:
+                - border-radius: 24px
+                - background-color: var(--contrast2)
+              icon:
+                - width: 32px
+                - color: var(--contrast8)
+
+          - type: custom:button-card
+            icon: mdi:volume-plus
+            aspect_ratio: 1/1
+            entity: media_player.nvidia_shield
+            show_name: false
+            tap_action:
+              action: call-service
+              haptic: medium
+              service: remote.send_command
+              service_data:
+                command: VolumeUp
+                device: Denon X4200
+                entity_id: remote.harmony
+            styles:
+              card:
+                - border-radius: 24px
+                - background-color: var(--contrast2)
+              icon:
+                - width: 32px
+                - color: var(--contrast8)
+
+      - type: grid
+        square: false
+        columns: 2
+        cards: 
+          - type: custom:button-card
+            name: Media Room
+            icon: mdi:track-light
+            entity: light.media_room_main_lights
+            template:
+              - light
+            variables:
+              var_entity: light.media_room_main_lights
+          - type: custom:button-card
+            name: Shades
+            icon: mdi:roller-shade
+            entity: cover.media_room_shades 
+            template:
+              - shade
+            variables: 
+              var_entity: cover.media_room_shades 
+          - type: custom:button-card
+            name: Entry Way
+            icon: mdi:track-light
+            entity: light.entry_way
+            template:
+              - light
+            variables:
+              var_entity: light.entry_way
+          - type: custom:button-card
+            name: Hall
+            icon: mdi:track-light
+            entity: light.hall
+            template:
+              - light
+            variables:
+              var_entity: light.hall 
